@@ -1,36 +1,30 @@
 CREATE DATABASE booking_room;
 
-CREATE TABLE admins(
-    id UUID,
-    username string UNIQUE,
-    password string,
-);
-
-CREATE TABLE general_advisors(
-    id UUID,
-    username string UNIQUE,
-    password string,
-);
-
-CREATE TABLE FORM(
+//post,get,getbyid,update
+CREATE TABLE transaksi(
     id UUID,
     karyawanId string,
-    tipeKamar int,
-    jadwal time.Time,
+    Kamar int, Foreign key Room struct
+    cek_in time.time
+    cek_out time.time
     keterangan string,
     status string,
 )
 
-CREATE TABLE karyawan(
+//post,getbyid,update,delete
+CREATE TABLE user(
     id UUID,
     name string,
     divisi string,
-    jabatan string,
-    contact string,
+    jabatan string, (admin, karyawan, GA, manajer ,direktur)
+    email string,
+    password string,
 );
 
+//post,getbyid,getall,update
 CREATE TABLE Room(
     id UUID,
-    type string,
+    tipe_kamar string,
     addons string,
+
 );
