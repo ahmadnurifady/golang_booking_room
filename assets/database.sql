@@ -3,8 +3,8 @@ CREATE DATABASE booking_room;
 //post,get,getbyid,update
 CREATE TABLE transaksi(
     id          UUID,
-    userId      string,
-    roomType    int,
+    userId      string,     //Foreign key ke user id
+    roomType    string,        //Foreign key ke room id
     cek_in      time.time,
     cek_out     time.time,
     description string,
