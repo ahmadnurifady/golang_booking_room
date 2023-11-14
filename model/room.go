@@ -13,15 +13,20 @@ type Room struct {
 }
 
 type RoomFacility struct {
-	Id              string    `json:"id"`
-	RoomId          string    `json:"roomId"`
-	RoomDescription string    `json:"description"`
-	Fwifi           bool      `json:"wifi"`
-	Fbreakfast      bool      `json:"breakfast"`
-	Fsmonking       bool      `json:"smoking"`
-	Ftelevison      bool      `json:"television"`
-	FcoffeMake      bool      `json:"coffe maker"`
-	FbathAmenities  bool      `json:"bathroom amenities"`
-	CreatedAt       time.Time `json:"createdAt"`
-	UpdatedAt       time.Time `json:"updatedAt"`
+	Id               string    `json:"id"`
+	RoomDescription  string    `json:"description"`
+	Fwifi            bool      `json:"wifi"`
+	FsoundSystem     bool      `json:"soundSystem"`
+	Fprojector       bool      `json:"projector"`
+	FscreenProjector bool      `json:"screenProjector"`
+	Fchairs          bool      `json:"chairs"`
+	Ftables          bool      `json:"tables"`
+	FsoundProof      bool      `json:"soundProof"`
+	FsmonkingArea    bool      `json:"smokingArea"`
+	Ftelevison       bool      `json:"television"`
+	FAc              bool      `json:"ac"`
+	Fbathroom        bool      `json:"bathroom"`
+	FcoffeMaker      bool      `json:"coffe maker"`
+	CreatedAt        time.Time `json:"createdAt"`
+	UpdatedAt        time.Time `json:"updatedAt"`
 }
