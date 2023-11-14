@@ -1,10 +1,97 @@
 package repository
 
+import (
+	"database/sql"
+	"final-project-booking-room/model"
+	"fmt"
+	"time"
+)
+
 type RoomRepository interface {
+	Create(payload model.Room) (model.Room, error)
+	Get(id string) (model.Room, error)
 }
 
-type roomRepository struct{}
+type roomRepository struct {
+	db *sql.DB
+}
 
-func NewRoomRepository() RoomRepository {
-	return &roomRepository{}
+// Get implements RoomRepository.
+func (r *roomRepository) Get(id string) (model.Room, error) {
+	var room model.Room
+	err := r.db.QueryRow(`SELECT r.id, r.roomtype, r.capacity, f.id, f.roomdescription, f.fwifi, f.fsoundsystem, f.fprojector, f.fscreenprojector, f.fchairs, f.ftables, f.fsoundproof, f.fsmonkingarea, f.ftelevison, f.fac, f.fbathroom, f.fcoffemaker, f.createdat, f.updatedat, r.status, r.createdat, r.updatedat FROM rooms AS r JOIN facilities AS f ON f.id = r.facilities WHERE r.id = $1;`, id).Scan(
+		&room.Id,
+		&room.RoomType,
+		&room.MaxCapacity,
+		&room.Facility.Id,
+		&room.Facility.RoomDescription,
+		&room.Facility.Fwifi,
+		&room.Facility.FsoundSystem,
+		&room.Facility.Fprojector,
+		&room.Facility.FscreenProjector,
+		&room.Facility.Fchairs,
+		&room.Facility.Ftables,
+		&room.Facility.FsoundProof,
+		&room.Facility.FsmonkingArea,
+		&room.Facility.Ftelevison,
+		&room.Facility.FAc,
+		&room.Facility.Fbathroom,
+		&room.Facility.FcoffeMaker,
+		&room.Facility.CreatedAt,
+		&room.Facility.UpdatedAt,
+		&room.Status,
+		&room.CreatedAt,
+		&room.UpdatedAt,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	return room, err
+}
+
+func (r *roomRepository) Create(payload model.Room) (model.Room, error) {
+
+	var room model.Room
+
+	// var facility []model.RoomFacility
+	var roomFacility model.RoomFacility
+	err := r.db.QueryRow(`INSERT INTO facilities (roomdescription, fwifi, fsoundsystem, fprojector, fscreenprojector, fchairs, ftables, fsoundproof, fsmonkingarea, ftelevison, fac, fbathroom, fcoffemaker, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id, roomdescription, fwifi, fsoundsystem, fprojector, fscreenprojector, fchairs, ftables, fsoundproof, fsmonkingarea, ftelevison, fac, fbathroom, fcoffemaker,createdat, updatedat`, payload.Facility.RoomDescription, payload.Facility.Fwifi, payload.Facility.FsoundSystem, payload.Facility.Fprojector, payload.Facility.FscreenProjector, payload.Facility.Fchairs, payload.Facility.Ftables, payload.Facility.FsoundProof, payload.Facility.FsmonkingArea, payload.Facility.Ftelevison, payload.Facility.FAc, payload.Facility.Fbathroom, payload.Facility.FcoffeMaker, time.Now()).Scan(
+		&roomFacility.Id,
+		&roomFacility.RoomDescription,
+		&roomFacility.Fwifi,
+		&roomFacility.FsoundSystem,
+		&roomFacility.Fprojector,
+		&roomFacility.FscreenProjector,
+		&roomFacility.Fchairs,
+		&roomFacility.Ftables,
+		&roomFacility.FsoundProof,
+		&roomFacility.FsmonkingArea,
+		&roomFacility.Ftelevison,
+		&roomFacility.FAc,
+		&roomFacility.Fbathroom,
+		&roomFacility.FcoffeMaker,
+		&roomFacility.CreatedAt,
+		&roomFacility.UpdatedAt,
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	room.Facility.Id = roomFacility.Id
+	fmt.Println(roomFacility.Id)
+	room.Facility = roomFacility
+	fmt.Println(room.Facility.Id)
+
+	err = r.db.QueryRow(`INSERT INTO rooms (roomtype, capacity, facilities ,status, updatedat) VALUES ($1, $2, $3, $4, $5) RETURNING id, roomtype, capacity, status, createdat, updatedat`, payload.RoomType, payload.MaxCapacity, roomFacility.Id, payload.Status, time.Now()).Scan(
+		&room.Id, &room.RoomType, &room.MaxCapacity, &room.Status, &room.CreatedAt, &room.UpdatedAt)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return room, err
+}
+
+func NewRoomRepository(db *sql.DB) RoomRepository {
+	return &roomRepository{db: db}
 }
