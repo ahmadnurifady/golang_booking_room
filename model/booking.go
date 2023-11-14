@@ -5,15 +5,21 @@ import (
 )
 
 type Booking struct {
-	Id               string    `json:"bookingId"`
-	Users            User      `json:"employe"`
-	Rooms            Room      `json:"roomType"`
-	BookingDateStart time.Time `json:"checkIn"`
-	BookingDateEnd   time.Time `json:"checkOut"`
-	Description      string    `json:"description"`
-	Status           string    `json:"status"`
-	CreatedAt        time.Time `json:"createdAt"`
-	UpdatedAt        time.Time `json:"updatedAt"`
+	Id             string          `json:"bookingId"`
+	Users          User            `json:"users"`
+	BookingDetails []BookingDetail `json:"bookingDetails"`
+	CreatedAt      time.Time       `json:"createdAt"`
+	UpdatedAt      time.Time       `json:"updatedAt"`
 }
 
-//ketika GA acc form booking, kolom status di tabel room otomatis berubah menjadi book
+type BookingDetail struct {
+	Id             string    `json:"id"`
+	BookingId      string    `json:"bookingId"`
+	Rooms          Room      `json:"rooms"`
+	Description    string    `json:"description"`
+	Status         string    `json:"status"`
+	BookingDate    time.Time `json:"checkIn"`
+	BookingDateEnd time.Time `json:"checkOut"`
+	CreatedAt      time.Time `json:"createdAt"`
+	UpdatedAt      time.Time `json:"updatedAt"`
+}

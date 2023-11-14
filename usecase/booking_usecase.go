@@ -28,7 +28,7 @@ func (b *bookingUseCase) FindById(id string, userId string) (model.Booking, erro
 
 // RegisterNewBooking implements BookingUseCase.
 func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto) (model.Booking, error) {
-	room, err := b.roomUC.FindById(payload.RoomId)
+	room, err := b.roomUC.FindById(payload.BoookingDetails.Rooms.Id)
 	if err != nil {
 		return model.Booking{}, err
 	}
@@ -38,6 +38,7 @@ func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto) (mode
 		return model.Booking{}, err
 	}
 
+	var bookingDetails []model.BookingDetail
 	newBookingPayload := model.Booking{
 		Rooms: room,
 		Users: user,
