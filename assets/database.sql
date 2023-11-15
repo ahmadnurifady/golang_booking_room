@@ -46,10 +46,24 @@ CREATE TABLE rooms (
 CREATE TABLE booking (
     id                      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     userId                  UUID,
-    bookingDate             TIMESTAMP,
     CreatedAt               TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UpdatedAt               TIMESTAMP,
     CONSTRAINT FK_userId FOREIGN KEY(userId) REFERENCES users(id)
+);
+
+CREATE TABLE booking_details(
+    id                      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    bookingId               UUID,
+    roomId                  UUID,
+    bookingDate             TIMESTAMP,
+    bookingDateEnd          TIMESTAMP,
+    status                  VARCHAR(100),
+    description             TEXT,
+    CreatedAt               TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt               TIMESTAMP,
+    CONSTRAINT FK_bookingId FOREIGN KEY(bookingId) REFERENCES booking(id),
+    CONSTRAINT FK_bookingId FOREIGN KEY(roomId) REFERENCES rooms(id),
+
 );
 
 CREATE TABLE booking_details(
