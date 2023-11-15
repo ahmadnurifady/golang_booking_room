@@ -41,10 +41,49 @@ func (r *RoomController) getHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, rspPayload)
 }
 
+func (r *RoomController) deleteHandler(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "id tidak ditemukan"})
+	}
+
+	err := r.uc.DeleteById(id)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "room yang dimaksud tidak ditemukan"})
+	}
+
+	ctx.JSON(http.StatusOK, "room telah dihapus")
+}
+
+func (r *RoomController) updateHandler(ctx *gin.Context) {
+	var roomUpdate model.Room
+	err := ctx.ShouldBind(&roomUpdate)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	id := ctx.Param("id")
+	if id == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "id tidak ditemukan"})
+		return
+	}
+
+	err = r.uc.DeleteById(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "product telah diupdate", "data": roomUpdate})
+}
+
 func (r *RoomController) Route() {
 	br := r.rg.Group("/rooms")
 	br.POST("/create", r.createHandler)
 	br.GET("/:id", r.getHandler)
+	br.DELETE("/:id", r.deleteHandler)
+	br.PUT(":id", r.updateHandler)
 }
 
 func NewRoomController(uc usecase.RoomUseCase, rg *gin.RouterGroup) *RoomController {

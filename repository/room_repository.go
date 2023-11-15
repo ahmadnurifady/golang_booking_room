@@ -10,10 +10,38 @@ import (
 type RoomRepository interface {
 	Create(payload model.Room) (model.Room, error)
 	Get(id string) (model.Room, error)
+	Delete(id string) error
+	Update(id string) error
 }
 
 type roomRepository struct {
 	db *sql.DB
+}
+
+// Update implements RoomRepository.
+func (r *roomRepository) Update(id string) error {
+	var room model.Room
+	var facilitie model.RoomFacility
+
+	err := r.db.QueryRow(`UPDATE rooms SET roomtype = $1, capacity = $2, status = $3, updatedat = $4 WHERE id = $5 RETURNING facilities`, room.RoomType, room.MaxCapacity, room.Status, time.Now(), id).Scan(room.Facility.Id)
+	if err != nil {
+		panic(err)
+	}
+
+	facilitie.Id = room.Facility.Id
+
+	_, err = r.db.Exec(`UPDATE facilities SET roomdescription = $1, fwifi = $2, fsoundsystem = $3, fprojector = $4, fscreenprojector = $5, fchairs = $6, ftables = $7, fsoundproof = $8, fsmonkingarea = $9, ftelevison = $10, fac = $11, fbathroom = $12, fcoffemaker = $13, updatedat = $14 WHERE id = $15`, facilitie.RoomDescription, facilitie.Fwifi, facilitie.FsoundSystem, facilitie.Fprojector, facilitie.FscreenProjector, facilitie.Fchairs, facilitie.Ftables, facilitie.FsoundProof, facilitie.FsmonkingArea, facilitie.Ftelevison, facilitie.FAc, facilitie.Fbathroom, facilitie.FcoffeMaker, time.Now(), facilitie.Id)
+
+	return err
+}
+
+// Delete implements RoomRepository.
+func (r *roomRepository) Delete(id string) error {
+	_, err := r.db.Exec(`DELETE FROM rooms WHERE id = $1`, id)
+	if err != nil {
+		panic(err)
+	}
+	return err
 }
 
 // Get implements RoomRepository.
