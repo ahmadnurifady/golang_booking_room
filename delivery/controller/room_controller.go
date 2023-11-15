@@ -3,6 +3,7 @@ package controller
 import (
 	"final-project-booking-room/model"
 	"final-project-booking-room/usecase"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -39,6 +40,27 @@ func (r *RoomController) getHandler(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, rspPayload)
+}
+
+func (r *RoomController) getByRoomtypeHandler(ctx *gin.Context) {
+	roomType := ctx.Query("roomtype")
+	var rspPayload model.Room
+	var err error
+
+	if roomType != "" {
+		rspPayload, err = r.uc.FindByRoomType(roomType)
+		if err != nil {
+			ctx.JSON(http.StatusNotFound, gin.H{"message": "room yang dimaksud tidak ditemukan"})
+		}
+	}
+
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "roomType yang dimaksud tidak ditemukan"})
+	}
+
+	fmt.Println(rspPayload.RoomType)
+	ctx.JSON(http.StatusOK, rspPayload)
+
 }
 
 func (r *RoomController) deleteHandler(ctx *gin.Context) {
@@ -82,6 +104,7 @@ func (r *RoomController) Route() {
 	br := r.rg.Group("/rooms")
 	br.POST("/create", r.createHandler)
 	br.GET("/:id", r.getHandler)
+	br.GET("/", r.getByRoomtypeHandler)
 	br.DELETE("/:id", r.deleteHandler)
 	br.PUT(":id", r.updateHandler)
 }
