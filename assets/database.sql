@@ -65,3 +65,17 @@ CREATE TABLE booking_details(
     CONSTRAINT FK_bookingId FOREIGN KEY(roomId) REFERENCES rooms(id),
 
 );
+
+CREATE TABLE booking_details(
+    id                      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    bookingId               UUID,
+    roomId                  UUID,
+    bookingDateEnd          TIMESTAMP,
+    status                  VARCHAR(100),
+    description             TEXT,
+    CreatedAt               TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt               TIMESTAMP,
+    CONSTRAINT FK_bookingId FOREIGN KEY(bookingId) REFERENCES booking(id),
+    CONSTRAINT FK_bookingId FOREIGN KEY(roomId) REFERENCES rooms(id),
+
+);
