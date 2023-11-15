@@ -6,7 +6,7 @@ import (
 
 type Booking struct {
 	Id             string          `json:"bookingId"`
-	UserId         User            `json:"employe"`
+	Users          User            `json:"employe"`
 	BookingDetails []BookingDetail `json:"bookingDetails"`
 	CreatedAt      time.Time       `json:"createdAt"`
 	UpdatedAt      time.Time       `json:"updatedAt"`

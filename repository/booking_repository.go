@@ -2,7 +2,7 @@ package repository
 
 import (
 	"database/sql"
-	"final-project-booking-room/model"
+	"final-project/model"
 	"time"
 )
 
@@ -37,11 +37,11 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 	var bookingDetails []model.BookingDetail
 	for _, v := range payload.BookingDetails {
 		var bookingDetail model.BookingDetail
-		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.Rooms.Id, v.BookingDate, v.BookingDateEnd, v.Status, v.Description, time.Now()).Scan(
+		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.RoomType.Id, v.BookingDateStart, v.BookingDateEnd, v.Status, v.Description, time.Now()).Scan(
 			&bookingDetail.Id,
 			&bookingDetail.BookingId,
-			&bookingDetail.Rooms.Id,
-			&bookingDetail.BookingDate,
+			&bookingDetail.RoomType.Id,
+			&bookingDetail.BookingDateStart,
 			&bookingDetail.BookingDateEnd,
 			&bookingDetail.Status,
 			&bookingDetail.Description,
@@ -53,7 +53,7 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 			return model.Booking{}, tx.Rollback()
 		}
 
-		bookingDetail.Rooms = v.Rooms
+		bookingDetail.RoomType = v.RoomType
 		bookingDetails = append(bookingDetails, bookingDetail)
 		if err := tx.Commit(); err != nil {
 			return model.Booking{}, err
@@ -112,33 +112,33 @@ func (b *bookingRepository) Get(id string, userId string) (model.Booking, error)
 		var bookingDetail model.BookingDetail
 		rows.Scan(
 			&bookingDetail.Id,
-			&bookingDetail.BookingDate,
+			&bookingDetail.BookingDateStart,
 			&bookingDetail.BookingDateEnd,
 			&bookingDetail.Status,
 			&bookingDetail.Description,
 			&bookingDetail.CreatedAt,
 			&bookingDetail.UpdatedAt,
-			&bookingDetail.Rooms.Id,
-			&bookingDetail.Rooms.RoomType,
-			&bookingDetail.Rooms.Capacity,
-			&bookingDetail.Rooms.Status,
-			&bookingDetail.Rooms.CreatedAt,
-			&bookingDetail.Rooms.UpdatedAt,
-			&bookingDetail.Rooms.Facility.Id,
-			&bookingDetail.Rooms.Facility.RoomDescription,
-			&bookingDetail.Rooms.Facility.Fwifi,
-			&bookingDetail.Rooms.Facility.FsoundSystem,
-			&bookingDetail.Rooms.Facility.Fprojector,
-			&bookingDetail.Rooms.Facility.Fchairs,
-			&bookingDetail.Rooms.Facility.Ftables,
-			&bookingDetail.Rooms.Facility.FsoundProof,
-			&bookingDetail.Rooms.Facility.FsmonkingArea,
-			&bookingDetail.Rooms.Facility.Ftelevison,
-			&bookingDetail.Rooms.Facility.FAc,
-			&bookingDetail.Rooms.Facility.Fbathroom,
-			&bookingDetail.Rooms.Facility.FcoffeMaker,
-			&bookingDetail.Rooms.Facility.UpdatedAt,
-			&bookingDetail.Rooms.Facility.CreatedAt,
+			&bookingDetail.RoomType.Id,
+			&bookingDetail.RoomType.RoomType,
+			&bookingDetail.RoomType.MaxCapacity,
+			&bookingDetail.RoomType.Status,
+			&bookingDetail.RoomType.CreatedAt,
+			&bookingDetail.RoomType.UpdatedAt,
+			&bookingDetail.RoomType.Facility.Id,
+			&bookingDetail.RoomType.Facility.RoomDescription,
+			&bookingDetail.RoomType.Facility.Fwifi,
+			&bookingDetail.RoomType.Facility.FsoundSystem,
+			&bookingDetail.RoomType.Facility.Fprojector,
+			&bookingDetail.RoomType.Facility.Fchairs,
+			&bookingDetail.RoomType.Facility.Ftables,
+			&bookingDetail.RoomType.Facility.FsoundProof,
+			&bookingDetail.RoomType.Facility.FsmonkingArea,
+			&bookingDetail.RoomType.Facility.Ftelevison,
+			&bookingDetail.RoomType.Facility.FAc,
+			&bookingDetail.RoomType.Facility.Fbathroom,
+			&bookingDetail.RoomType.Facility.FcoffeMaker,
+			&bookingDetail.RoomType.Facility.UpdatedAt,
+			&bookingDetail.RoomType.Facility.CreatedAt,
 		)
 		bookingDetails = append(bookingDetails, bookingDetail)
 

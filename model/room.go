@@ -3,13 +3,13 @@ package model
 import "time"
 
 type Room struct {
-	Id        string       `json:"id"`
-	RoomType  string       `json:"roomType"`
-	Capacity  string       `json:"capacity"`
-	Facility  RoomFacility `json:"facility"`
-	Status    string       `json:"status"` //untuk status hanya ada dua yaitu Available atau Booked
-	CreatedAt time.Time    `json:"createdAt"`
-	UpdatedAt time.Time    `json:"updatedAt"`
+	Id          string       `json:"id"`
+	RoomType    string       `json:"roomType"`
+	MaxCapacity int          `json:"maxcapacity"`
+	Facility    RoomFacility `json:"facility"`
+	Status      string       `json:"status"` //untuk status hanya ada dua yaitu Available atau Booked
+	CreatedAt   time.Time    `json:"createdAt"`
+	UpdatedAt   time.Time    `json:"updatedAt"`
 }
 
 type RoomFacility struct {
@@ -26,7 +26,7 @@ type RoomFacility struct {
 	Ftelevison       string    `json:"television"`
 	FAc              string    `json:"ac"`
 	Fbathroom        string    `json:"bathroom"`
-	FcoffeMaker      string    `json:"coffe maker"`
+	FcoffeMaker      string    `json:"coffeMaker"`
 	CreatedAt        time.Time `json:"createdAt"`
 	UpdatedAt        time.Time `json:"updatedAt"`
 }
