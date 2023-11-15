@@ -1,14 +1,20 @@
 package manager
 
-import "final-project-booking-room/repository"
+import "final-project/repository"
 
 type RepoManager interface {
 	RoomRepo() repository.RoomRepository
 	UserRepo() repository.UserRepository
+	BookingRepo() repository.BookingRepository
 }
 
 type repoManager struct {
 	infra InfraManager
+}
+
+// BookingRepo implements RepoManager.
+func (r *repoManager) BookingRepo() repository.BookingRepository {
+	return repository.NewBookingRepository(r.infra.Conn())
 }
 
 // RoomRepo implements RepoManager.

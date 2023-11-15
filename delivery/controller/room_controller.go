@@ -50,8 +50,9 @@ func (r *RoomController) getByRoomtypeHandler(ctx *gin.Context) {
 	// var rspPayload model.Room
 	// var err error
 
-	if roomType != "" {
+	if roomType == "" {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, "roomtype cant be empty")
+		return
 	}
 	rspPayload, err := r.uc.FindByRoomType(roomType)
 	if err != nil {

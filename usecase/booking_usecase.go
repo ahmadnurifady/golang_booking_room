@@ -2,13 +2,13 @@ package usecase
 
 import (
 	"final-project/model"
-	"final-project/model/dto"
+	// "final-project/model/dto"
 	"final-project/repository"
 	"fmt"
 )
 
 type BookingUseCase interface {
-	RegisterNewBooking(payload dto.BookingRequestDto) (model.Booking, error)
+	// RegisterNewBooking(payload dto.BookingRequestDto) (model.Booking, error)
 	FindById(id string, userId string) (model.Booking, error)
 }
 type bookingUseCase struct {
@@ -27,30 +27,30 @@ func (b *bookingUseCase) FindById(id string, userId string) (model.Booking, erro
 }
 
 // RegisterNewBooking implements BookingUseCase.
-func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto) (model.Booking, error) {
-	room, err := b.roomUC.FindById(payload.BoookingDetails.Rooms.Id)
-	if err != nil {
-		return model.Booking{}, err
-	}
+// func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto) (model.Booking, error) {
+// 	room, err := b.roomUC.FindById(payload.BoookingDetails.Room.Id)
+// 	if err != nil {
+// 		return model.Booking{}, err
+// 	}
 
-	user, err := b.userUC.FindById(payload.UserId)
-	if err != nil {
-		return model.Booking{}, err
-	}
+// 	user, err := b.userUC.FindById(payload.UserId)
+// 	if err != nil {
+// 		return model.Booking{}, err
+// 	}
 
-	var bookingDetails []model.BookingDetail
-	newBookingPayload := model.Booking{
-		Rooms: room,
-		Users: user,
-	}
+// 	var bookingDetails []model.BookingDetail
+// 	newBookingPayload := model.Booking{
+// 		Rooms: room,
+// 		Users: user,
+// 	}
 
-	booking, err := b.repo.Create(newBookingPayload)
-	if err != nil {
-		return model.Booking{}, err
-	}
+// 	booking, err := b.repo.Create(newBookingPayload)
+// 	if err != nil {
+// 		return model.Booking{}, err
+// 	}
 
-	return booking, nil
-}
+// 	return booking, nil
+// }
 
 func NewBookingUseCase(
 	repo repository.BookingRepository,

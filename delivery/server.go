@@ -19,6 +19,7 @@ type Server struct {
 func (s *Server) setupControllers() {
 	rg := s.engine.Group("/final/v1")
 	controller.NewRoomController(s.uc.RoomUsecase(), rg).Route()
+	controller.NewUserController(s.uc.UserUseCase(), rg).Route()
 }
 
 func (s *Server) Run() {

@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"final-project/model/dto"
+	// "final-project/model/dto"
 	"final-project/usecase"
 	"final-project/utils/common"
 	"net/http"
@@ -14,21 +14,21 @@ type BookingController struct {
 	rg *gin.RouterGroup
 }
 
-func (b *BookingController) createHandler(ctx *gin.Context) {
-	var payload dto.BookingRequestDto
-	if err := ctx.ShouldBindJSON(&payload); err != nil {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
-		return
-	}
+// func (b *BookingController) createHandler(ctx *gin.Context) {
+// 	var payload dto.BookingRequestDto
+// 	if err := ctx.ShouldBindJSON(&payload); err != nil {
+// 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+// 		return
+// 	}
 
-	rspPayload, err := b.uc.RegisterNewBooking(payload)
-	if err != nil {
-		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
-		return
-	}
+// 	rspPayload, err := b.uc.RegisterNewBooking(payload)
+// 	if err != nil {
+// 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+// 		return
+// 	}
 
-	common.SendCreateResponse(ctx, "Ok", rspPayload)
-}
+// 	common.SendCreateResponse(ctx, "Ok", rspPayload)
+// }
 
 func (b *BookingController) getHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
@@ -49,7 +49,7 @@ func (b *BookingController) getHandler(ctx *gin.Context) {
 
 func (b *BookingController) Route() {
 	br := b.rg.Group("/booking")
-	br.POST("/", b.createHandler)
+	// br.POST("/", b.createHandler)
 	br.GET("/:id", b.getHandler)
 }
 
