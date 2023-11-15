@@ -18,8 +18,8 @@ type BookingDetail struct {
 	Rooms          Room      `json:"rooms"`
 	Description    string    `json:"description"`
 	Status         string    `json:"status"`
-	BookingDate    time.Time `json:"checkIn"`
-	BookingDateEnd time.Time `json:"checkOut"`
+	BookingDate    time.Time `json:"bookingDate"`
+	BookingDateEnd time.Time `json:"bookingDateEnd"`
 	CreatedAt      time.Time `json:"createdAt"`
 	UpdatedAt      time.Time `json:"updatedAt"`
 }

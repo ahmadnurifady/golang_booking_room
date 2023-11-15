@@ -37,7 +37,13 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 	var bookingDetails []model.BookingDetail
 	for _, v := range payload.BookingDetails {
 		var bookingDetail model.BookingDetail
-		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.Rooms.Id, v.BookingDate, v.BookingDateEnd, v.Status, v.Description, time.Now()).Scan(
+
+		// convert booking date end, 3 hari setelah start
+		now := time.Now()
+		threeDays := 3 * 24 * time.Hour
+		threeDaysLater := now.Add(threeDays)
+
+		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.Rooms.Id, time.Now(), threeDaysLater, v.Status, v.Description, time.Now()).Scan(
 			&bookingDetail.Id,
 			&bookingDetail.BookingId,
 			&bookingDetail.Rooms.Id,
@@ -55,9 +61,7 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 
 		bookingDetail.Rooms = v.Rooms
 		bookingDetails = append(bookingDetails, bookingDetail)
-		if err := tx.Commit(); err != nil {
-			return model.Booking{}, err
-		}
+
 	}
 
 	booking.Users = payload.Users
@@ -66,7 +70,6 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 	if err := tx.Commit(); err != nil {
 		return model.Booking{}, err
 	}
-
 	return booking, err
 }
 
@@ -120,7 +123,7 @@ func (b *bookingRepository) Get(id string, userId string) (model.Booking, error)
 			&bookingDetail.UpdatedAt,
 			&bookingDetail.Rooms.Id,
 			&bookingDetail.Rooms.RoomType,
-			&bookingDetail.Rooms.Capacity,
+			&bookingDetail.Rooms.MaxCapacity,
 			&bookingDetail.Rooms.Status,
 			&bookingDetail.Rooms.CreatedAt,
 			&bookingDetail.Rooms.UpdatedAt,

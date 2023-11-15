@@ -1,8 +1,11 @@
 package controller
 
 import (
+	"final-project-booking-room/config"
 	"final-project-booking-room/model/dto"
 	"final-project-booking-room/usecase"
+	"final-project-booking-room/utils/common"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,8 +22,10 @@ func (b *BookingController) createHandler(ctx *gin.Context) {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
+	fmt.Println("ini payload booking details :", payload.BoookingDetails)
 
 	rspPayload, err := b.uc.RegisterNewBooking(payload)
+	fmt.Println(rspPayload)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
@@ -36,7 +41,8 @@ func (b *BookingController) getHandler(ctx *gin.Context) {
 		return
 	}
 
-	rspPayload, err := b.uc.FindById(id)
+	userId := ctx.MustGet(config.UserSesion).(string)
+	rspPayload, err := b.uc.FindById(id, userId)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
 		return
@@ -46,9 +52,9 @@ func (b *BookingController) getHandler(ctx *gin.Context) {
 }
 
 func (b *BookingController) Route() {
-	br := b.rg.Group("/booking")
-	br.POST("/", b.createHandler)
-	br.GET("/:id", b.getHandler)
+	bc := b.rg.Group(config.BookingGroup)
+	bc.POST(config.BookingPost, b.createHandler)
+	bc.GET(config.BookingGet, b.getHandler)
 }
 
 func NewBookingController(
