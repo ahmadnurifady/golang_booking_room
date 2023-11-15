@@ -11,11 +11,31 @@ type BookingUseCase interface {
 	RegisterNewBooking(payload dto.BookingRequestDto) (model.Booking, error)
 	FindById(id string) (model.Booking, error)
 	ViewAllBooking() ([]model.Booking, error)
+	ViewAllBookingByStatus(status string) ([]model.Booking, error)
+	UpdateStatusBookAndRoom(id string, approval string) (model.Booking, error)
 }
 type bookingUseCase struct {
 	repo   repository.BookingRepository
 	userUC UserUseCase
 	roomUC RoomUseCase
+}
+
+// UpdateStatusBookAndRoom implements BookingUseCase.
+func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (model.Booking, error) {
+	booking, err := b.repo.UpdateStatus(id, approval)
+	if err != nil {
+		return model.Booking{}, fmt.Errorf("Booking detail with ID %s not found", id)
+	}
+	return booking, nil
+}
+
+// ViewAllBookingByStatus implements BookingUseCase.
+func (b *bookingUseCase) ViewAllBookingByStatus(status string) ([]model.Booking, error) {
+	bookings, err := b.repo.GetAllByStatus(status)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get data, err: %v", err)
+	}
+	return bookings, nil
 }
 
 // ViewAllBooking implements BookingUseCase.
@@ -29,11 +49,11 @@ func (b *bookingUseCase) ViewAllBooking() ([]model.Booking, error) {
 
 // FindById implements BookingUseCase.
 func (b *bookingUseCase) FindById(id string) (model.Booking, error) {
-	bill, err := b.repo.Get(id)
+	booking, err := b.repo.Get(id)
 	if err != nil {
 		return model.Booking{}, fmt.Errorf("Booking with ID %s not found", id)
 	}
-	return bill, nil
+	return booking, nil
 }
 
 // RegisterNewBooking implements BookingUseCase.
