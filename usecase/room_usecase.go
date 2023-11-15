@@ -3,6 +3,7 @@ package usecase
 import (
 	"final-project/model"
 	"final-project/repository"
+	"fmt"
 )
 
 type RoomUseCase interface {
@@ -21,7 +22,7 @@ type roomUseCase struct {
 func (r *roomUseCase) FindByRoomType(roomType string) (model.Room, error) {
 	findRoom, err := r.repo.GetByRoomType(roomType)
 	if err != nil {
-		panic(err)
+		return model.Room{}, fmt.Errorf("room with roomType %s not found", roomType)
 	}
 	return findRoom, err
 }
@@ -49,7 +50,7 @@ func (r *roomUseCase) DeleteById(id string) error {
 func (r *roomUseCase) FindById(id string) (model.Room, error) {
 	findRoom, err := r.repo.Get(id)
 	if err != nil {
-		panic(err)
+		return model.Room{}, fmt.Errorf("room with roomType %s not found", id)
 	}
 
 	return findRoom, err

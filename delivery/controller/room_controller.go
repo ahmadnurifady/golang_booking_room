@@ -3,7 +3,7 @@ package controller
 import (
 	"final-project/model"
 	"final-project/usecase"
-	"fmt"
+	"final-project/utils/common"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,63 +18,66 @@ func (r *RoomController) createHandler(ctx *gin.Context) {
 	var payload model.Room
 	err := ctx.ShouldBindJSON(&payload)
 	if err != nil {
-		panic(err)
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
 	}
 
 	createRoom, err := r.uc.RegisterNewRoom(payload)
 	if err != nil {
-		panic(err)
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
 	}
-	ctx.JSON(http.StatusCreated, createRoom)
+	common.SendCreateResponse(ctx, "ok", createRoom)
 }
 
 func (r *RoomController) getHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "id tidak ditemukan"})
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "id cant be empty")
+		return
 	}
 
 	rspPayload, err := r.uc.FindById(id)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"message": "room yang dimaksud tidak ditemukan"})
+		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
+		return
 	}
-
-	ctx.JSON(http.StatusOK, rspPayload)
+	common.SendSingleResponse(ctx, "ok", rspPayload)
 }
 
 func (r *RoomController) getByRoomtypeHandler(ctx *gin.Context) {
 	roomType := ctx.Query("roomtype")
-	var rspPayload model.Room
-	var err error
+	// var rspPayload model.Room
+	// var err error
 
 	if roomType != "" {
-		rspPayload, err = r.uc.FindByRoomType(roomType)
-		if err != nil {
-			ctx.JSON(http.StatusNotFound, gin.H{"message": "room yang dimaksud tidak ditemukan"})
-		}
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "roomtype cant be empty")
 	}
-
+	rspPayload, err := r.uc.FindByRoomType(roomType)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"message": "roomType yang dimaksud tidak ditemukan"})
+		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
+		return
 	}
 
-	fmt.Println(rspPayload.RoomType)
-	ctx.JSON(http.StatusOK, rspPayload)
+	// fmt.Println(rspPayload.RoomType)
+	common.SendSingleResponse(ctx, "Ok", rspPayload)
 
 }
 
 func (r *RoomController) deleteHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "id tidak ditemukan"})
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
+		return
 	}
 
 	err := r.uc.DeleteById(id)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"message": "room yang dimaksud tidak ditemukan"})
+		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
+		return
 	}
 
-	ctx.JSON(http.StatusOK, "room telah dihapus")
+	common.SendSingleResponse(ctx, "ok", err)
 }
 
 func (r *RoomController) updateHandler(ctx *gin.Context) {

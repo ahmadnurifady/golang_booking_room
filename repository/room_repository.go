@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"final-project/model"
-	"fmt"
 	"time"
 )
 
@@ -47,7 +46,7 @@ func (r *roomRepository) GetByRoomType(roomType string) (model.Room, error) {
 		&room.UpdatedAt,
 	)
 	if err != nil {
-		panic(err)
+		return model.Room{}, err
 	}
 	return room, err
 }
@@ -106,7 +105,7 @@ func (r *roomRepository) Get(id string) (model.Room, error) {
 		&room.UpdatedAt,
 	)
 	if err != nil {
-		panic(err)
+		return model.Room{}, err
 	}
 
 	return room, err
@@ -137,18 +136,16 @@ func (r *roomRepository) Create(payload model.Room) (model.Room, error) {
 		&roomFacility.UpdatedAt,
 	)
 	if err != nil {
-		panic(err)
+		return model.Room{}, err
 	}
 
 	room.Facility.Id = roomFacility.Id
-	fmt.Println(roomFacility.Id)
 	room.Facility = roomFacility
-	fmt.Println(room.Facility.Id)
 
 	err = r.db.QueryRow(`INSERT INTO rooms (roomtype, capacity, facilities ,status, updatedat) VALUES ($1, $2, $3, $4, $5) RETURNING id, roomtype, capacity, status, createdat, updatedat`, payload.RoomType, payload.MaxCapacity, roomFacility.Id, payload.Status, time.Now()).Scan(
 		&room.Id, &room.RoomType, &room.MaxCapacity, &room.Status, &room.CreatedAt, &room.UpdatedAt)
 	if err != nil {
-		panic(err.Error())
+		return model.Room{}, err
 	}
 
 	return room, err
