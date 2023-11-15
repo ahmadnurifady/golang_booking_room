@@ -9,7 +9,8 @@ import (
 
 type BookingUseCase interface {
 	RegisterNewBooking(payload dto.BookingRequestDto) (model.Booking, error)
-	FindById(id string, userId string) (model.Booking, error)
+	FindById(id string) (model.Booking, error)
+	ViewAllBooking() ([]model.Booking, error)
 }
 type bookingUseCase struct {
 	repo   repository.BookingRepository
@@ -17,9 +18,18 @@ type bookingUseCase struct {
 	roomUC RoomUseCase
 }
 
+// ViewAllBooking implements BookingUseCase.
+func (b *bookingUseCase) ViewAllBooking() ([]model.Booking, error) {
+	bookings, err := b.repo.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get all bookings: %v", err)
+	}
+	return bookings, nil
+}
+
 // FindById implements BookingUseCase.
-func (b *bookingUseCase) FindById(id string, userId string) (model.Booking, error) {
-	bill, err := b.repo.Get(id, userId)
+func (b *bookingUseCase) FindById(id string) (model.Booking, error) {
+	bill, err := b.repo.Get(id)
 	if err != nil {
 		return model.Booking{}, fmt.Errorf("Booking with ID %s not found", id)
 	}
@@ -42,7 +52,10 @@ func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto) (mode
 		}
 
 		bookingDetails = append(bookingDetails, model.BookingDetail{
-			Rooms: room,
+
+			Rooms:       room,
+			Description: v.Description,
+			Status:      v.Status,
 		})
 	}
 

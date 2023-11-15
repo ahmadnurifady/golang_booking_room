@@ -7,9 +7,10 @@ const (
 	UserPost  = "/"
 	UserGet   = "/:id"
 
-	BookingGroup = "/booking"
-	BookingPost  = "/"
-	BookingGet   = "/:id"
+	BookingGroup  = "/booking"
+	BookingPost   = "/"
+	BookingGet    = "/:id"
+	BookingGetAll = "/"
 
 	RoomGroup = "/rooms"
 	RoomPost  = "/"

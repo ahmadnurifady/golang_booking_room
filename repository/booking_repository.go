@@ -3,16 +3,61 @@ package repository
 import (
 	"database/sql"
 	"final-project-booking-room/model"
+	"fmt"
 	"time"
 )
 
 type BookingRepository interface {
 	Create(payload model.Booking) (model.Booking, error)
-	Get(id string, userId string) (model.Booking, error)
+	Get(id string) (model.Booking, error)
+	GetAll() ([]model.Booking, error)
 }
 
 type bookingRepository struct {
 	db *sql.DB
+}
+
+// GetAll implements BookingRepository.
+func (b *bookingRepository) GetAll() ([]model.Booking, error) {
+	var bookings []model.Booking
+
+	rows, err := b.db.Query(`SELECT b.*, bd.* FROM booking b JOIN booking_details bd ON bd.bookingid = b.id;`)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get bookings: %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var booking model.Booking
+
+		err := rows.Scan(
+			&booking.Id,
+			&booking.Users.Id,
+			&booking.CreatedAt,
+			&booking.UpdatedAt,
+			&booking.BookingDetails[0],
+			&booking.BookingDetails[1],
+			&booking.BookingDetails[2],
+			&booking.BookingDetails[3],
+			&booking.BookingDetails[4],
+			&booking.BookingDetails[5],
+			&booking.BookingDetails[6],
+			&booking.BookingDetails[7],
+			&booking.BookingDetails[8],
+			&booking.BookingDetails[9],
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf("failed to get bookings: %v", err)
+		}
+		bookings = append(bookings, booking)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to get bookings: %v", err)
+	}
+
+	return bookings, nil
 }
 
 // Create implements BookingRepository.
@@ -43,6 +88,8 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 		threeDays := 3 * 24 * time.Hour
 		threeDaysLater := now.Add(threeDays)
 
+		fmt.Println("status :", v.Status)
+		fmt.Println("desc :", v.Description)
 		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.Rooms.Id, time.Now(), threeDaysLater, v.Status, v.Description, time.Now()).Scan(
 			&bookingDetail.Id,
 			&bookingDetail.BookingId,
@@ -74,7 +121,7 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 }
 
 // Get implements BookingRepository.
-func (b *bookingRepository) Get(id string, userId string) (model.Booking, error) {
+func (b *bookingRepository) Get(id string) (model.Booking, error) {
 	var booking model.Booking
 
 	err := b.db.QueryRow(`SELECT b.id, u.id, u.name, u.divisi, u.jabatan, u.email, u.role, u.createdat, u.updatedat, b.createdat, b.updatedat 
@@ -100,7 +147,7 @@ func (b *bookingRepository) Get(id string, userId string) (model.Booking, error)
 	}
 
 	var bookingDetails []model.BookingDetail
-	rows, err := b.db.Query(`SELECT bd.id, bd.bookingdate, bd.bookingdateend, bd.status, bd.description, bd.createdat, bd.updatedat, r.id, r.roomtype, r.capacity, r.status, r.createdat, r.updatedat, f.id, f.roomdescription, f.fwifi, f.soundsystem, f.fprojector, f.fchairs, f.ftables, f.fsoundproof, f.fsmonkingarea, f.ftelevison, f.fac, f.fbathroom, f.fcoffemaker, f.createdat, f.updatedat
+	rows, err := b.db.Query(`SELECT bd.id, bd.bookingdate, bd.bookingdateend, bd.status, bd.description, bd.createdat, bd.updatedat, r.id, r.roomtype, r.capacity, r.status, r.createdat, r.updatedat, f.id, f.roomdescription, f.fwifi, f.fsoundsystem, f.fprojector, f.fchairs, f.ftables, f.fsoundproof, f.fsmonkingarea, f.ftelevison, f.fac, f.fbathroom, f.fcoffemaker, f.createdat, f.updatedat
 	FROM 
 	booking_details bd JOIN booking b ON b.id = bd.bookingid
 	JOIN rooms r ON r.id = bd.roomid
