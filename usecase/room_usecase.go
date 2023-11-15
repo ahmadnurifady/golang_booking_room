@@ -8,12 +8,22 @@ import (
 type RoomUseCase interface {
 	RegisterNewRoom(payload model.Room) (model.Room, error)
 	FindById(id string) (model.Room, error)
+	FindByRoomType(roomType string) (model.Room, error)
 	DeleteById(id string) error
 	UpdateById(id string) error
 }
 
 type roomUseCase struct {
 	repo repository.RoomRepository
+}
+
+// FindByRoomType implements RoomUseCase.
+func (r *roomUseCase) FindByRoomType(roomType string) (model.Room, error) {
+	findRoom, err := r.repo.GetByRoomType(roomType)
+	if err != nil {
+		panic(err)
+	}
+	return findRoom, err
 }
 
 // UpdateById implements RoomUseCase.

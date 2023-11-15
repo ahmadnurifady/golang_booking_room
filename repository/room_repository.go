@@ -10,12 +10,46 @@ import (
 type RoomRepository interface {
 	Create(payload model.Room) (model.Room, error)
 	Get(id string) (model.Room, error)
+	GetByRoomType(roomType string) (model.Room, error)
 	Delete(id string) error
 	Update(id string) error
 }
 
 type roomRepository struct {
 	db *sql.DB
+}
+
+// GetByRoomType implements RoomRepository.
+func (r *roomRepository) GetByRoomType(roomType string) (model.Room, error) {
+	var room model.Room
+	err := r.db.QueryRow(`SELECT r.id, r.roomtype, r.capacity, f.id, f.roomdescription, f.fwifi, f.fsoundsystem, f.fprojector, f.fscreenprojector, f.fchairs, f.ftables, f.fsoundproof, f.fsmonkingarea, f.ftelevison, f.fac, f.fbathroom, f.fcoffemaker, f.createdat, f.updatedat, r.status, r.createdat, r.updatedat FROM rooms AS r JOIN facilities AS f ON f.id = r.facilities WHERE r.roomtype = $1;`, roomType).Scan(
+		&room.Id,
+		&room.RoomType,
+		&room.MaxCapacity,
+		&room.Facility.Id,
+		&room.Facility.RoomDescription,
+		&room.Facility.Fwifi,
+		&room.Facility.FsoundSystem,
+		&room.Facility.Fprojector,
+		&room.Facility.FscreenProjector,
+		&room.Facility.Fchairs,
+		&room.Facility.Ftables,
+		&room.Facility.FsoundProof,
+		&room.Facility.FsmonkingArea,
+		&room.Facility.Ftelevison,
+		&room.Facility.FAc,
+		&room.Facility.Fbathroom,
+		&room.Facility.FcoffeMaker,
+		&room.Facility.CreatedAt,
+		&room.Facility.UpdatedAt,
+		&room.Status,
+		&room.CreatedAt,
+		&room.UpdatedAt,
+	)
+	if err != nil {
+		panic(err)
+	}
+	return room, err
 }
 
 // Update implements RoomRepository.
