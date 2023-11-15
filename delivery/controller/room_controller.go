@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"final-project-booking-room/model"
-	"final-project-booking-room/usecase"
+	"final-project/model"
+	"final-project/usecase"
 	"fmt"
 	"net/http"
 

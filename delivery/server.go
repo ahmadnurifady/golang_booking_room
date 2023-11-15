@@ -1,9 +1,9 @@
 package delivery
 
 import (
-	"final-project-booking-room/config"
-	"final-project-booking-room/delivery/controller"
-	"final-project-booking-room/manager"
+	"final-project/config"
+	"final-project/delivery/controller"
+	"final-project/manager"
 	"fmt"
 	"log"
 

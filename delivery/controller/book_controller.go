@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"final-project-booking-room/model/dto"
-	"final-project-booking-room/usecase"
+	"final-project/model/dto"
+	"final-project/usecase"
+	"final-project/utils/common"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -35,8 +36,9 @@ func (b *BookingController) getHandler(ctx *gin.Context) {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, "Booking ID can't be empty")
 		return
 	}
+	userId := ctx.Param("userId")
 
-	rspPayload, err := b.uc.FindById(id)
+	rspPayload, err := b.uc.FindById(id, userId)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
 		return

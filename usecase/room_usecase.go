@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"final-project-booking-room/model"
-	"final-project-booking-room/repository"
+	"final-project/model"
+	"final-project/repository"
 )
 
 type RoomUseCase interface {
