@@ -2,9 +2,9 @@ package usecase
 
 import (
 	"errors"
-	"final-project/model"
-	"final-project/repository"
-	"final-project/utils/common"
+	"final-project-booking-room/model"
+	"final-project-booking-room/repository"
+	"final-project-booking-room/utils/common"
 	"fmt"
 )
 

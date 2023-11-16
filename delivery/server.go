@@ -1,9 +1,9 @@
 package delivery
 
 import (
-	"final-project/config"
-	"final-project/delivery/controller"
-	"final-project/manager"
+	"final-project-booking-room/config"
+	"final-project-booking-room/delivery/controller"
+	"final-project-booking-room/manager"
 	"fmt"
 	"log"
 
@@ -17,9 +17,11 @@ type Server struct {
 }
 
 func (s *Server) setupControllers() {
-	rg := s.engine.Group("/final/v1")
-	controller.NewRoomController(s.uc.RoomUsecase(), rg).Route()
+	s.engine.Use()
+	rg := s.engine.Group("/api/v1")
 	controller.NewUserController(s.uc.UserUseCase(), rg).Route()
+	controller.NewRoomController(s.uc.RoomUsecase(), rg).Route()
+	controller.NewBookingController(s.uc.BookingUsecase(), rg).Route()
 }
 
 func (s *Server) Run() {
