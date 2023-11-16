@@ -12,10 +12,31 @@ type RoomUseCase interface {
 	FindByRoomType(roomType string) (model.Room, error)
 	DeleteById(id string) error
 	UpdateById(id string) error
+	GetRoomStatus(id string) (string, error)
+	ChangeRoomStatus(id string) error
 }
 
 type roomUseCase struct {
 	repo repository.RoomRepository
+}
+
+// ChangeRoomStatus implements RoomUseCase.
+func (r *roomUseCase) ChangeRoomStatus(id string) error {
+	err := r.repo.ChangeStatus(id)
+	if err != nil {
+		panic(err)
+	}
+
+	return err
+}
+
+// GetRoomStatus implements RoomUseCase.
+func (r *roomUseCase) GetRoomStatus(id string) (string, error) {
+	getStatus, err := r.repo.GetStatus(id)
+	if err != nil {
+		return "Can't get room status", fmt.Errorf("room with id %s not found", id)
+	}
+	return getStatus, err
 }
 
 // FindByRoomType implements RoomUseCase.

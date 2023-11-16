@@ -12,10 +12,32 @@ type RoomRepository interface {
 	GetByRoomType(roomType string) (model.Room, error)
 	Delete(id string) error
 	Update(id string) error
+	GetStatus(id string) (string, error)
+	ChangeStatus(id string) error
 }
 
 type roomRepository struct {
 	db *sql.DB
+}
+
+// ChangeStatus implements RoomRepository.
+func (r *roomRepository) ChangeStatus(id string) error {
+	status := "available"
+	_, err := r.db.Exec(`UPDATE rooms SET status = $1 WHERE id = $2`, status, id)
+	if err != nil {
+		panic(err)
+	}
+	return err
+}
+
+// getRoomStatus implements RoomRepository.
+func (r *roomRepository) GetStatus(roomId string) (string, error) {
+	var status string
+	err := r.db.QueryRow("SELECT status FROM rooms WHERE id = $1", roomId).Scan(&status)
+	if err != nil {
+		return "Can't get room status", err
+	}
+	return status, nil
 }
 
 // GetByRoomType implements RoomRepository.

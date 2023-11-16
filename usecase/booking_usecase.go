@@ -23,10 +23,17 @@ type bookingUseCase struct {
 
 // UpdateStatusBookAndRoom implements BookingUseCase.
 func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (model.Booking, error) {
+
+	status, err := b.repo.GetBookStatus(id)
+	if status != "pending" {
+		return model.Booking{}, fmt.Errorf("Booking status with ID %s is already changed (not pending)", id)
+	}
+
 	booking, err := b.repo.UpdateStatus(id, approval)
 	if err != nil {
 		return model.Booking{}, fmt.Errorf("Booking detail with ID %s not found", id)
 	}
+
 	return booking, nil
 }
 
@@ -70,6 +77,11 @@ func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto) (mode
 		room, err := b.roomUC.FindById(v.Rooms.Id)
 		if err != nil {
 			return model.Booking{}, err
+		}
+
+		status, err := b.roomUC.GetRoomStatus(v.Rooms.Id)
+		if status != "available" {
+			return model.Booking{}, fmt.Errorf("Room status with ID %s not available", v.Rooms.Id)
 		}
 
 		bookingDetails = append(bookingDetails, model.BookingDetail{
