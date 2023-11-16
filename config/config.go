@@ -20,9 +20,14 @@ type DbConfig struct {
 	Driver   string
 }
 
+type LogFileConfig struct {
+	FilePath string
+}
+
 type Config struct {
 	ApiConfig
 	DbConfig
+	LogFileConfig
 }
 
 func (c *Config) readConfig() error {
@@ -41,6 +46,10 @@ func (c *Config) readConfig() error {
 		User:     os.Getenv("DB_USER"),
 		Password: os.Getenv("DB_PASSWORD"),
 		Driver:   os.Getenv("DB_DRIVER"),
+	}
+
+	c.LogFileConfig = LogFileConfig{
+		FilePath: os.Getenv("LOG_FILE"),
 	}
 
 	if c.ApiPort == "" || c.Host == "" || c.Port == "" || c.Name == "" || c.User == "" || c.Password == "" || c.Driver == "" {
