@@ -9,3 +9,4 @@ go.mod
 >>>>>>> 30ad13fbd0d80edcb5ac39caa5c9e442fcc5a1bf
 go.sum
 >>>>>>> master
+logger.log

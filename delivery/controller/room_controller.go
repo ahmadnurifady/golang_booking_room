@@ -82,6 +82,22 @@ func (r *RoomController) deleteHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", err)
 }
 
+func (r *RoomController) changeStatusHandler(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id == "" {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
+		return
+	}
+
+	err := r.uc.ChangeRoomStatus(id)
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(ctx, "Room status has changed to available", err)
+}
+
 func (r *RoomController) updateHandler(ctx *gin.Context) {
 	var roomUpdate model.Room
 	err := ctx.ShouldBind(&roomUpdate)
@@ -112,6 +128,7 @@ func (r *RoomController) Route() {
 	br.GET("/", r.getByRoomtypeHandler)
 	br.DELETE("/:id", r.deleteHandler)
 	br.PUT(":id", r.updateHandler)
+	br.PUT("/status/:id", r.changeStatusHandler)
 }
 
 func NewRoomController(uc usecase.RoomUseCase, rg *gin.RouterGroup) *RoomController {

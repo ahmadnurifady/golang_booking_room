@@ -3,7 +3,9 @@ package delivery
 import (
 	"final-project-booking-room/config"
 	"final-project-booking-room/delivery/controller"
+	"final-project-booking-room/delivery/middleware"
 	"final-project-booking-room/manager"
+	"final-project-booking-room/utils/common"
 	"fmt"
 	"log"
 
@@ -11,13 +13,14 @@ import (
 )
 
 type Server struct {
-	uc     manager.UseCaseManager
-	engine *gin.Engine
-	host   string
+	uc         manager.UseCaseManager
+	engine     *gin.Engine
+	host       string
+	logService common.MyLogger
 }
 
 func (s *Server) setupControllers() {
-	s.engine.Use()
+	s.engine.Use(middleware.NewLogMiddleware(s.logService).LogRequest())
 	rg := s.engine.Group("/api/v1")
 	controller.NewUserController(s.uc.UserUseCase(), rg).Route()
 	controller.NewRoomController(s.uc.RoomUsecase(), rg).Route()
@@ -45,9 +48,12 @@ func NewServer() *Server {
 	uc := manager.NewUseCaseManager(repo)
 	engine := gin.Default()
 	host := fmt.Sprintf(":%s", cfg.ApiPort)
+	logService := common.NewMyLogger(cfg.LogFileConfig)
+
 	return &Server{
-		uc:     uc,
-		engine: engine,
-		host:   host,
+		uc:         uc,
+		engine:     engine,
+		host:       host,
+		logService: logService,
 	}
 }
