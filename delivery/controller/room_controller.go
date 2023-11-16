@@ -30,6 +30,16 @@ func (r *RoomController) createHandler(ctx *gin.Context) {
 	common.SendCreateResponse(ctx, "ok", createRoom)
 }
 
+func (r *RoomController) getAllRoom(ctx *gin.Context) {
+	rspPayload, err := r.uc.ViewAllRooms()
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(ctx, "Ok", rspPayload)
+}
+
 func (r *RoomController) getHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
@@ -51,8 +61,12 @@ func (r *RoomController) getByRoomtypeHandler(ctx *gin.Context) {
 	// var err error
 
 	if roomType == "" {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "roomtype cant be empty")
-		return
+		getAll, err := r.uc.ViewAllRooms()
+		if err != nil {
+			common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+			return
+		}
+		common.SendSingleResponse(ctx, "Ok", getAll)
 	}
 	rspPayload, err := r.uc.FindByRoomType(roomType)
 	if err != nil {
@@ -82,6 +96,12 @@ func (r *RoomController) deleteHandler(ctx *gin.Context) {
 }
 
 func (r *RoomController) updateHandler(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id == "" {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
+		return
+	}
+
 	var roomUpdate model.Room
 	err := ctx.ShouldBind(&roomUpdate)
 	if err != nil {
@@ -89,26 +109,21 @@ func (r *RoomController) updateHandler(ctx *gin.Context) {
 		return
 	}
 
-	id := ctx.Param("id")
-	if id == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "id tidak ditemukan"})
-		return
-	}
-
-	err = r.uc.DeleteById(id)
+	roomUpdate, err = r.uc.UpdateById(id)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "product telah diupdate", "data": roomUpdate})
+	common.SendSingleResponse(ctx, "Ok", roomUpdate)
 }
 
 func (r *RoomController) Route() {
 	br := r.rg.Group("/rooms")
 	br.POST("/create", r.createHandler)
-	br.GET("/:id", r.getHandler)
 	br.GET("/", r.getByRoomtypeHandler)
+	br.GET("/getall", r.getAllRoom)
+	br.GET("/:id", r.getHandler)
 	br.DELETE("/:id", r.deleteHandler)
 	br.PUT(":id", r.updateHandler)
 }
