@@ -1,9 +1,10 @@
 package controller
 
 import (
-	"final-project/model"
-	"final-project/usecase"
-	"final-project/utils/common"
+	"final-project-booking-room/model"
+	"final-project-booking-room/usecase"
+	"final-project-booking-room/utils/common"
+
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -95,6 +96,22 @@ func (r *RoomController) deleteHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "ok", nil)
 }
 
+func (r *RoomController) changeStatusHandler(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id == "" {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
+		return
+	}
+
+	err := r.uc.ChangeRoomStatus(id)
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(ctx, "Room status has changed to available", err)
+}
+
 func (r *RoomController) updateHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if id == "" {
@@ -126,6 +143,7 @@ func (r *RoomController) Route() {
 	br.GET("/:id", r.getHandler)
 	br.DELETE("/:id", r.deleteHandler)
 	br.PUT(":id", r.updateHandler)
+	br.PUT("/status/:id", r.changeStatusHandler)
 }
 
 func NewRoomController(uc usecase.RoomUseCase, rg *gin.RouterGroup) *RoomController {

@@ -2,10 +2,10 @@ package common
 
 import (
 	"errors"
-	"final-project/config"
-	"final-project/model"
-	"final-project/model/dto"
-	"final-project/utils/modelutil"
+	"final-project-booking-room/config"
+	"final-project-booking-room/model"
+	"final-project-booking-room/model/dto"
+	"final-project-booking-room/utils/modelutil"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"

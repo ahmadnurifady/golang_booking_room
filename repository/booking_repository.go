@@ -2,17 +2,227 @@ package repository
 
 import (
 	"database/sql"
-	"final-project/model"
+	"final-project-booking-room/model"
+	"fmt"
 	"time"
 )
 
 type BookingRepository interface {
 	Create(payload model.Booking) (model.Booking, error)
-	Get(id string, userId string) (model.Booking, error)
+	Get(id string) (model.Booking, error)
+	GetAll() ([]model.Booking, error)
+	GetAllByStatus(status string) ([]model.Booking, error)
+	UpdateStatus(id string, approval string) (model.Booking, error)
+	GetBookStatus(id string) (string, error)
 }
 
 type bookingRepository struct {
 	db *sql.DB
+}
+
+// GetBookStatus implements BookingRepository.
+func (b *bookingRepository) GetBookStatus(id string) (string, error) {
+	var status string
+	err := b.db.QueryRow("SELECT status FROM booking_details WHERE id = $1", id).Scan(&status)
+	if err != nil {
+		return "Can't get booking detail status", err
+	}
+	return status, nil
+}
+
+// UpdateStatus implements BookingRepository.
+func (b *bookingRepository) UpdateStatus(id string, approval string) (model.Booking, error) {
+	var booking model.Booking
+
+	// Memulai transaksi
+	tx, err := b.db.Begin()
+	if err != nil {
+
+		return model.Booking{}, err
+	}
+
+	// Update status booking_details
+	var bookingId, roomId string
+	err = tx.QueryRow(`UPDATE booking_details SET status = $1
+	WHERE id = $2 RETURNING bookingid, roomid`, approval, id).Scan(&bookingId, &roomId)
+	if err != nil {
+		tx.Rollback()
+		return model.Booking{}, err
+	}
+
+	// Update status rooms based on approval
+	status := "available"
+	if approval == "accept" {
+		status = "booked"
+	}
+	_, err = tx.Exec(`UPDATE rooms SET status = $1 WHERE id = $2`, status, roomId)
+	if err != nil {
+		tx.Rollback()
+		return model.Booking{}, err
+	}
+
+	// Commit transaksi
+	if err := tx.Commit(); err != nil {
+		return model.Booking{}, err
+	}
+
+	booking, err = b.Get(bookingId)
+	if err != nil {
+		return model.Booking{}, err
+	}
+	return booking, nil
+}
+
+// GetAllByStatus implements BookingRepository.
+func (b *bookingRepository) GetAllByStatus(status string) ([]model.Booking, error) {
+	var bookings []model.Booking
+
+	rows, err := b.db.Query(`SELECT b.id, u.id, u.name, u.divisi, u.jabatan, u.email, u.role, u.createdat, u.updatedat, b.createdat, b.updatedat 
+	FROM 
+	booking b JOIN users u ON u.id = b.userid JOIN booking_details bd ON bd.bookingid = b.id WHERE status = $1`, status)
+
+	if err != nil {
+		return nil, fmt.Errorf("Can't find data with status : %s", status)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var booking model.Booking
+		err := rows.Scan(
+			&booking.Id,
+			&booking.Users.Id,
+			&booking.Users.Name,
+			&booking.Users.Divisi,
+			&booking.Users.Jabatan,
+			&booking.Users.Email,
+			&booking.Users.Role,
+			&booking.Users.CreatedAt,
+			&booking.Users.UpdatedAt,
+			&booking.CreatedAt,
+			&booking.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		// Ambil data booking_details untuk setiap booking
+		bookingDetails, err := b.getBookingDetailsByBookingID(booking.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		booking.BookingDetails = bookingDetails
+		bookings = append(bookings, booking)
+	}
+
+	if len(bookings) == 0 {
+		return nil, fmt.Errorf("Can't find data with status: %s", status)
+	}
+	return bookings, nil
+}
+
+// GetAll implements BookingRepository.
+func (b *bookingRepository) GetAll() ([]model.Booking, error) {
+	var bookings []model.Booking
+
+	rows, err := b.db.Query(`SELECT b.id, u.id, u.name, u.divisi, u.jabatan, u.email, u.role, u.createdat, u.updatedat, b.createdat, b.updatedat 
+	FROM 
+	booking b JOIN users u ON u.id = b.userid`)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var booking model.Booking
+		err := rows.Scan(
+			&booking.Id,
+			&booking.Users.Id,
+			&booking.Users.Name,
+			&booking.Users.Divisi,
+			&booking.Users.Jabatan,
+			&booking.Users.Email,
+			&booking.Users.Role,
+			&booking.Users.CreatedAt,
+			&booking.Users.UpdatedAt,
+			&booking.CreatedAt,
+			&booking.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		// Ambil data booking_details untuk setiap booking
+		bookingDetails, err := b.getBookingDetailsByBookingID(booking.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		booking.BookingDetails = bookingDetails
+		bookings = append(bookings, booking)
+	}
+
+	return bookings, nil
+}
+
+func (b *bookingRepository) getBookingDetailsByBookingID(bookingID string) ([]model.BookingDetail, error) {
+	var bookingDetails []model.BookingDetail
+
+	rows, err := b.db.Query(`SELECT bd.id, bd.bookingdate, bd.bookingdateend, bd.status, bd.description, bd.createdat, bd.updatedat, r.id, r.roomtype, r.capacity, r.status, r.createdat, r.updatedat, f.id, f.roomdescription, f.fwifi, f.fsoundsystem, f.fprojector, f.fchairs, f.ftables, f.fsoundproof, f.fsmonkingarea, f.ftelevison, f.fac, f.fbathroom, f.fcoffemaker, f.createdat, f.updatedat
+	FROM 
+	booking_details bd JOIN rooms r ON r.id = bd.roomid
+	JOIN facilities f ON f.id = r.facilities 
+	WHERE bd.bookingid = $1`, bookingID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var bookingDetail model.BookingDetail
+		err := rows.Scan(
+			&bookingDetail.Id,
+			&bookingDetail.BookingDate,
+			&bookingDetail.BookingDateEnd,
+			&bookingDetail.Status,
+			&bookingDetail.Description,
+			&bookingDetail.CreatedAt,
+			&bookingDetail.UpdatedAt,
+			&bookingDetail.Rooms.Id,
+			&bookingDetail.Rooms.RoomType,
+			&bookingDetail.Rooms.MaxCapacity,
+			&bookingDetail.Rooms.Status,
+			&bookingDetail.Rooms.CreatedAt,
+			&bookingDetail.Rooms.UpdatedAt,
+			&bookingDetail.Rooms.Facility.Id,
+			&bookingDetail.Rooms.Facility.RoomDescription,
+			&bookingDetail.Rooms.Facility.Fwifi,
+			&bookingDetail.Rooms.Facility.FsoundSystem,
+			&bookingDetail.Rooms.Facility.Fprojector,
+			&bookingDetail.Rooms.Facility.Fchairs,
+			&bookingDetail.Rooms.Facility.Ftables,
+			&bookingDetail.Rooms.Facility.FsoundProof,
+			&bookingDetail.Rooms.Facility.FsmonkingArea,
+			&bookingDetail.Rooms.Facility.Ftelevison,
+			&bookingDetail.Rooms.Facility.FAc,
+			&bookingDetail.Rooms.Facility.Fbathroom,
+			&bookingDetail.Rooms.Facility.FcoffeMaker,
+			&bookingDetail.Rooms.Facility.UpdatedAt,
+			&bookingDetail.Rooms.Facility.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		bookingDetails = append(bookingDetails, bookingDetail)
+	}
+
+	return bookingDetails, nil
 }
 
 // Create implements BookingRepository.
@@ -37,11 +247,20 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 	var bookingDetails []model.BookingDetail
 	for _, v := range payload.BookingDetails {
 		var bookingDetail model.BookingDetail
-		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.RoomType.Id, v.BookingDateStart, v.BookingDateEnd, v.Status, v.Description, time.Now()).Scan(
+
+		// convert booking date end, 3 hari setelah start
+		now := time.Now()
+		threeDays := 3 * 24 * time.Hour
+		threeDaysLater := now.Add(threeDays)
+
+		// status awal booking : pending
+		bdStatus := "pending"
+
+		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.Rooms.Id, time.Now(), threeDaysLater, bdStatus, v.Description, time.Now()).Scan(
 			&bookingDetail.Id,
 			&bookingDetail.BookingId,
-			&bookingDetail.RoomType.Id,
-			&bookingDetail.BookingDateStart,
+			&bookingDetail.Rooms.Id,
+			&bookingDetail.BookingDate,
 			&bookingDetail.BookingDateEnd,
 			&bookingDetail.Status,
 			&bookingDetail.Description,
@@ -53,11 +272,9 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 			return model.Booking{}, tx.Rollback()
 		}
 
-		bookingDetail.RoomType = v.RoomType
+		bookingDetail.Rooms = v.Rooms
 		bookingDetails = append(bookingDetails, bookingDetail)
-		if err := tx.Commit(); err != nil {
-			return model.Booking{}, err
-		}
+
 	}
 
 	booking.Users = payload.Users
@@ -66,19 +283,18 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 	if err := tx.Commit(); err != nil {
 		return model.Booking{}, err
 	}
-
 	return booking, err
 }
 
 // Get implements BookingRepository.
-func (b *bookingRepository) Get(id string, userId string) (model.Booking, error) {
+func (b *bookingRepository) Get(id string) (model.Booking, error) {
 	var booking model.Booking
 
-	err := b.db.QueryRow(`SELECT b.id, u.id, u.name, u.divisi, u.jabatan, u.email, u.role, u.createdat, u.updatedat, b.createdat, b.updatedat 
-	FROM 
-	booking b JOIN users u ON u.id = b.userid
-	WHERE
-	b.id = $1`, id).Scan(
+	err := b.db.QueryRow(`
+		SELECT b.id, u.id, u.name, u.divisi, u.jabatan, u.email, u.role, u.createdat, u.updatedat, b.createdat, b.updatedat 
+		FROM booking b 
+		JOIN users u ON u.id = b.userid
+		WHERE b.id = $1`, id).Scan(
 		&booking.Id,
 		&booking.Users.Id,
 		&booking.Users.Name,
@@ -96,53 +312,12 @@ func (b *bookingRepository) Get(id string, userId string) (model.Booking, error)
 		return model.Booking{}, err
 	}
 
-	var bookingDetails []model.BookingDetail
-	rows, err := b.db.Query(`SELECT bd.id, bd.bookingdate, bd.bookingdateend, bd.status, bd.description, bd.createdat, bd.updatedat, r.id, r.roomtype, r.capacity, r.status, r.createdat, r.updatedat, f.id, f.roomdescription, f.fwifi, f.soundsystem, f.fprojector, f.fchairs, f.ftables, f.fsoundproof, f.fsmonkingarea, f.ftelevison, f.fac, f.fbathroom, f.fcoffemaker, f.createdat, f.updatedat
-	FROM 
-	booking_details bd JOIN booking b ON b.id = bd.bookingid
-	JOIN rooms r ON r.id = bd.roomid
-	JOIN facilities f ON f.id = r.facilities 
-	WHERE b.id = $1`, booking.Id)
-
+	// Menggunakan getBookingDetailsByBookingID untuk mendapatkan data booking details
+	bookingDetails, err := b.getBookingDetailsByBookingID(id)
 	if err != nil {
 		return model.Booking{}, err
 	}
 
-	for rows.Next() {
-		var bookingDetail model.BookingDetail
-		rows.Scan(
-			&bookingDetail.Id,
-			&bookingDetail.BookingDateStart,
-			&bookingDetail.BookingDateEnd,
-			&bookingDetail.Status,
-			&bookingDetail.Description,
-			&bookingDetail.CreatedAt,
-			&bookingDetail.UpdatedAt,
-			&bookingDetail.RoomType.Id,
-			&bookingDetail.RoomType.RoomType,
-			&bookingDetail.RoomType.MaxCapacity,
-			&bookingDetail.RoomType.Status,
-			&bookingDetail.RoomType.CreatedAt,
-			&bookingDetail.RoomType.UpdatedAt,
-			&bookingDetail.RoomType.Facility.Id,
-			&bookingDetail.RoomType.Facility.RoomDescription,
-			&bookingDetail.RoomType.Facility.Fwifi,
-			&bookingDetail.RoomType.Facility.FsoundSystem,
-			&bookingDetail.RoomType.Facility.Fprojector,
-			&bookingDetail.RoomType.Facility.Fchairs,
-			&bookingDetail.RoomType.Facility.Ftables,
-			&bookingDetail.RoomType.Facility.FsoundProof,
-			&bookingDetail.RoomType.Facility.FsmonkingArea,
-			&bookingDetail.RoomType.Facility.Ftelevison,
-			&bookingDetail.RoomType.Facility.FAc,
-			&bookingDetail.RoomType.Facility.Fbathroom,
-			&bookingDetail.RoomType.Facility.FcoffeMaker,
-			&bookingDetail.RoomType.Facility.UpdatedAt,
-			&bookingDetail.RoomType.Facility.CreatedAt,
-		)
-		bookingDetails = append(bookingDetails, bookingDetail)
-
-	}
 	booking.BookingDetails = bookingDetails
 
 	return booking, nil

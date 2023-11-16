@@ -18,4 +18,15 @@ const (
 	UserDelete = "/:id"
 	UserGetAll = "/"
 	UserUpdate = "/"
+
+	BookingGroup          = "/booking"
+	BookingPost           = "/"
+	BookingGet            = "/:id"
+	BookingGetAll         = "/"
+	BookingGetAllByStatus = "/status/:status"
+	Approval              = "/approval"
+
+	RoomGroup = "/rooms"
+	RoomPost  = "/"
+	RoomGet   = "/:id"
 )

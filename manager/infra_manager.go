@@ -2,7 +2,7 @@ package manager
 
 import (
 	"database/sql"
-	"final-project/config"
+	"final-project-booking-room/config"
 	"fmt"
 
 	_ "github.com/lib/pq"

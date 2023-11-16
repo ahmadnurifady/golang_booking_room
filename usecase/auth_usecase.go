@@ -1,9 +1,9 @@
 package usecase
 
 import (
-	"final-project/model"
-	"final-project/model/dto"
-	"final-project/utils/common"
+	"final-project-booking-room/model"
+	"final-project-booking-room/model/dto"
+	"final-project-booking-room/utils/common"
 )
 
 type AuthUseCase interface {

@@ -1,14 +1,20 @@
 package manager
 
-import "final-project/usecase"
+import "final-project-booking-room/usecase"
 
 type UseCaseManager interface {
-	RoomUsecase() usecase.RoomUseCase
 	UserUseCase() usecase.UserUseCase
+	RoomUsecase() usecase.RoomUseCase
+	BookingUsecase() usecase.BookingUseCase
 }
 
 type useCaseManager struct {
 	repo RepoManager
+}
+
+// BookingUsecase implements UseCaseManager.
+func (u *useCaseManager) BookingUsecase() usecase.BookingUseCase {
+	return usecase.NewBookingUseCase(u.repo.BookingRepo(), u.UserUseCase(), u.RoomUsecase())
 }
 
 // RoomUsecase implements UseCaseManager.

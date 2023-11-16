@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"final-project/model"
-	"final-project/repository"
+	"final-project-booking-room/model"
+	"final-project-booking-room/repository"
 	"fmt"
 )
 
@@ -13,6 +13,8 @@ type RoomUseCase interface {
 	ViewAllRooms() ([]model.Room, error)
 	DeleteById(id string) (model.Room, error)
 	UpdateById(id string, payload model.Room) (model.Room, error)
+	GetRoomStatus(id string) (string, error)
+	ChangeRoomStatus(id string) error
 }
 
 type roomUseCase struct {
@@ -27,6 +29,25 @@ func (r *roomUseCase) ViewAllRooms() ([]model.Room, error) {
 	}
 
 	return room, err
+}
+
+// ChangeRoomStatus implements RoomUseCase.
+func (r *roomUseCase) ChangeRoomStatus(id string) error {
+	err := r.repo.ChangeStatus(id)
+	if err != nil {
+		panic(err)
+	}
+
+	return err
+}
+
+// GetRoomStatus implements RoomUseCase.
+func (r *roomUseCase) GetRoomStatus(id string) (string, error) {
+	getStatus, err := r.repo.GetStatus(id)
+	if err != nil {
+		return "Can't get room status", fmt.Errorf("room with id %s not found", id)
+	}
+	return getStatus, err
 }
 
 // FindByRoomType implements RoomUseCase.

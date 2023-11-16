@@ -1,13 +1,13 @@
 package delivery
 
 import (
-	"final-project/config"
-	"final-project/delivery/controller"
 
 	// "final-project/delivery/middleware"
-	"final-project/manager"
-	"final-project/usecase"
-	"final-project/utils/common"
+	"final-project-booking-room/config"
+	"final-project-booking-room/delivery/controller"
+	"final-project-booking-room/manager"
+	"final-project-booking-room/usecase"
+	"final-project-booking-room/utils/common"
 	"fmt"
 	"log"
 
@@ -27,6 +27,8 @@ func (s *Server) setupControllers() {
 	rg := s.engine.Group("/final/v1")
 	controller.NewRoomController(s.uc.RoomUsecase(), rg).Route()
 	controller.NewUserController(s.uc.UserUseCase(), rg).Route()
+	controller.NewRoomController(s.uc.RoomUsecase(), rg).Route()
+	controller.NewBookingController(s.uc.BookingUsecase(), rg).Route()
 }
 
 func (s *Server) Run() {

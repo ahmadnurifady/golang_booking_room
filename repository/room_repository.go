@@ -2,7 +2,7 @@ package repository
 
 import (
 	"database/sql"
-	"final-project/model"
+	"final-project-booking-room/model"
 	"time"
 )
 
@@ -13,6 +13,8 @@ type RoomRepository interface {
 	GetAllRoom() ([]model.Room, error)
 	Delete(id string) (model.Room, error)
 	Update(id string, payload model.Room) (model.Room, error)
+	GetStatus(id string) (string, error)
+	ChangeStatus(id string) error
 }
 
 type roomRepository struct {
@@ -65,6 +67,26 @@ func (r *roomRepository) GetAllRoom() ([]model.Room, error) {
 	}
 
 	return rooms, err
+}
+
+// ChangeStatus implements RoomRepository.
+func (r *roomRepository) ChangeStatus(id string) error {
+	status := "available"
+	_, err := r.db.Exec(`UPDATE rooms SET status = $1 WHERE id = $2`, status, id)
+	if err != nil {
+		panic(err)
+	}
+	return err
+}
+
+// getRoomStatus implements RoomRepository.
+func (r *roomRepository) GetStatus(roomId string) (string, error) {
+	var status string
+	err := r.db.QueryRow("SELECT status FROM rooms WHERE id = $1", roomId).Scan(&status)
+	if err != nil {
+		return "Can't get room status", err
+	}
+	return status, nil
 }
 
 // GetByRoomType implements RoomRepository.
