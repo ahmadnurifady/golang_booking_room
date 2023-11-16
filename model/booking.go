@@ -13,7 +13,6 @@ type Booking struct {
 }
 
 type BookingDetail struct {
-<<<<<<< HEAD
 	Id             string    `json:"id"`
 	BookingId      string    `json:"bookingId"`
 	Rooms          Room      `json:"rooms"`
@@ -23,15 +22,4 @@ type BookingDetail struct {
 	BookingDateEnd time.Time `json:"bookingDateEnd"`
 	CreatedAt      time.Time `json:"createdAt"`
 	UpdatedAt      time.Time `json:"updatedAt"`
-=======
-	Id               string    `json:"id"`
-	BookingId        string    `json:"bookingId"`
-	RoomType         Room      `json:"RoomType"`
-	Description      string    `json:"description"`
-	Status           string    `json:"status"`
-	BookingDateStart time.Time `json:"checkIn"`
-	BookingDateEnd   time.Time `json:"checkOut"`
-	CreatedAt        time.Time `json:"createdAt"`
-	UpdatedAt        time.Time `json:"updatedAt"`
->>>>>>> master
 }

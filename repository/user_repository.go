@@ -2,25 +2,17 @@ package repository
 
 import (
 	"database/sql"
-<<<<<<< HEAD
 	"final-project-booking-room/model"
 	"final-project-booking-room/utils/common"
-=======
-	"final-project/model"
-	"final-project/utils/common"
->>>>>>> master
 	"time"
 )
 
 type UserRepository interface {
 	GetById(id string) (model.User, error)
 	Create(payload model.User) (model.User, error)
-<<<<<<< HEAD
-=======
 	UpdateUserById(id string, payload model.User) (model.User, error)
 	DeleteUserById(id string) (model.User, error)
 	GetAllUser() ([]model.User, error)
->>>>>>> master
 }
 
 type userRepository struct {
@@ -54,8 +46,6 @@ func (u *userRepository) Create(payload model.User) (model.User, error) {
 	return user, nil
 }
 
-<<<<<<< HEAD
-=======
 // !MENGUPDATE USER BERDASARKAN ID
 func (u *userRepository) UpdateUserById(id string, payload model.User) (model.User, error) {
 	var user model.User
@@ -106,7 +96,6 @@ func (u *userRepository) GetAllUser() ([]model.User, error) {
 	return users, nil
 }
 
->>>>>>> master
 func NewUserRepository(db *sql.DB) UserRepository {
 	return &userRepository{db: db}
 }

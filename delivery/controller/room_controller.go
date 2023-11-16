@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"final-project-booking-room/config"
 	"final-project-booking-room/model"
 	"final-project-booking-room/usecase"
+	"final-project-booking-room/utils/common"
 
 	"net/http"
 

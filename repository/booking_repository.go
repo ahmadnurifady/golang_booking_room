@@ -2,12 +2,8 @@ package repository
 
 import (
 	"database/sql"
-<<<<<<< HEAD
 	"final-project-booking-room/model"
 	"fmt"
-=======
-	"final-project/model"
->>>>>>> master
 	"time"
 )
 
@@ -242,7 +238,6 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 	var bookingDetails []model.BookingDetail
 	for _, v := range payload.BookingDetails {
 		var bookingDetail model.BookingDetail
-<<<<<<< HEAD
 
 		// convert booking date end, 3 hari setelah start
 		now := time.Now()
@@ -252,13 +247,10 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 		fmt.Println("status :", v.Status)
 		fmt.Println("desc :", v.Description)
 		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.Rooms.Id, time.Now(), threeDaysLater, v.Status, v.Description, time.Now()).Scan(
-=======
-		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.RoomType.Id, v.BookingDateStart, v.BookingDateEnd, v.Status, v.Description, time.Now()).Scan(
->>>>>>> master
 			&bookingDetail.Id,
 			&bookingDetail.BookingId,
-			&bookingDetail.RoomType.Id,
-			&bookingDetail.BookingDateStart,
+			&bookingDetail.Rooms.Id,
+			&bookingDetail.BookingDate,
 			&bookingDetail.BookingDateEnd,
 			&bookingDetail.Status,
 			&bookingDetail.Description,
@@ -270,7 +262,7 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 			return model.Booking{}, tx.Rollback()
 		}
 
-		bookingDetail.RoomType = v.RoomType
+		bookingDetail.Rooms = v.Rooms
 		bookingDetails = append(bookingDetails, bookingDetail)
 
 	}
@@ -316,44 +308,6 @@ func (b *bookingRepository) Get(id string) (model.Booking, error) {
 		return model.Booking{}, err
 	}
 
-<<<<<<< HEAD
-=======
-	for rows.Next() {
-		var bookingDetail model.BookingDetail
-		rows.Scan(
-			&bookingDetail.Id,
-			&bookingDetail.BookingDateStart,
-			&bookingDetail.BookingDateEnd,
-			&bookingDetail.Status,
-			&bookingDetail.Description,
-			&bookingDetail.CreatedAt,
-			&bookingDetail.UpdatedAt,
-			&bookingDetail.RoomType.Id,
-			&bookingDetail.RoomType.RoomType,
-			&bookingDetail.RoomType.MaxCapacity,
-			&bookingDetail.RoomType.Status,
-			&bookingDetail.RoomType.CreatedAt,
-			&bookingDetail.RoomType.UpdatedAt,
-			&bookingDetail.RoomType.Facility.Id,
-			&bookingDetail.RoomType.Facility.RoomDescription,
-			&bookingDetail.RoomType.Facility.Fwifi,
-			&bookingDetail.RoomType.Facility.FsoundSystem,
-			&bookingDetail.RoomType.Facility.Fprojector,
-			&bookingDetail.RoomType.Facility.Fchairs,
-			&bookingDetail.RoomType.Facility.Ftables,
-			&bookingDetail.RoomType.Facility.FsoundProof,
-			&bookingDetail.RoomType.Facility.FsmonkingArea,
-			&bookingDetail.RoomType.Facility.Ftelevison,
-			&bookingDetail.RoomType.Facility.FAc,
-			&bookingDetail.RoomType.Facility.Fbathroom,
-			&bookingDetail.RoomType.Facility.FcoffeMaker,
-			&bookingDetail.RoomType.Facility.UpdatedAt,
-			&bookingDetail.RoomType.Facility.CreatedAt,
-		)
-		bookingDetails = append(bookingDetails, bookingDetail)
-
-	}
->>>>>>> master
 	booking.BookingDetails = bookingDetails
 
 	return booking, nil

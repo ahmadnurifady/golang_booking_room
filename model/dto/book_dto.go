@@ -1,6 +1,6 @@
 package dto
 
-import "final-project/model"
+import "final-project-booking-room/model"
 
 type BookingRequestDto struct {
 	Id              string                `json:"id"`

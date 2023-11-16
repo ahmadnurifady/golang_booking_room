@@ -2,22 +2,14 @@ package repository
 
 import (
 	"database/sql"
-<<<<<<< HEAD
 	"final-project-booking-room/model"
-	"fmt"
-=======
-	"final-project/model"
->>>>>>> master
 	"time"
 )
 
 type RoomRepository interface {
 	Create(payload model.Room) (model.Room, error)
 	Get(id string) (model.Room, error)
-<<<<<<< HEAD
-=======
 	GetByRoomType(roomType string) (model.Room, error)
->>>>>>> master
 	Delete(id string) error
 	Update(id string) error
 }
@@ -26,8 +18,6 @@ type roomRepository struct {
 	db *sql.DB
 }
 
-<<<<<<< HEAD
-=======
 // GetByRoomType implements RoomRepository.
 func (r *roomRepository) GetByRoomType(roomType string) (model.Room, error) {
 	var room model.Room
@@ -61,7 +51,6 @@ func (r *roomRepository) GetByRoomType(roomType string) (model.Room, error) {
 	return room, err
 }
 
->>>>>>> master
 // Update implements RoomRepository.
 func (r *roomRepository) Update(id string) error {
 	var room model.Room
@@ -116,11 +105,7 @@ func (r *roomRepository) Get(id string) (model.Room, error) {
 		&room.UpdatedAt,
 	)
 	if err != nil {
-<<<<<<< HEAD
-		panic(err)
-=======
 		return model.Room{}, err
->>>>>>> master
 	}
 
 	return room, err
@@ -151,30 +136,16 @@ func (r *roomRepository) Create(payload model.Room) (model.Room, error) {
 		&roomFacility.UpdatedAt,
 	)
 	if err != nil {
-<<<<<<< HEAD
-		panic(err)
-	}
-
-	room.Facility.Id = roomFacility.Id
-	fmt.Println(roomFacility.Id)
-	room.Facility = roomFacility
-	fmt.Println(room.Facility.Id)
-=======
 		return model.Room{}, err
 	}
 
 	room.Facility.Id = roomFacility.Id
 	room.Facility = roomFacility
->>>>>>> master
 
 	err = r.db.QueryRow(`INSERT INTO rooms (roomtype, capacity, facilities ,status, updatedat) VALUES ($1, $2, $3, $4, $5) RETURNING id, roomtype, capacity, status, createdat, updatedat`, payload.RoomType, payload.MaxCapacity, roomFacility.Id, payload.Status, time.Now()).Scan(
 		&room.Id, &room.RoomType, &room.MaxCapacity, &room.Status, &room.CreatedAt, &room.UpdatedAt)
 	if err != nil {
-<<<<<<< HEAD
-		panic(err.Error())
-=======
 		return model.Room{}, err
->>>>>>> master
 	}
 
 	return room, err

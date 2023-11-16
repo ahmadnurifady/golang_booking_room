@@ -1,7 +1,7 @@
 package common
 
 import (
-	modelutil "final-project-booking-room/utils/model_utils"
+	"final-project-booking-room/utils/modelutil"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
