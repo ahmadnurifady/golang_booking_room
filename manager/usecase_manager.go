@@ -1,6 +1,8 @@
 package manager
 
-import "final-project-booking-room/usecase"
+import (
+	"final-project-booking-room/usecase"
+)
 
 type UseCaseManager interface {
 	UserUseCase() usecase.UserUseCase

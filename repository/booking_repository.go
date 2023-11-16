@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"final-project-booking-room/model"
+	"final-project-booking-room/utils/common"
 	"fmt"
 	"time"
 )
@@ -13,10 +14,20 @@ type BookingRepository interface {
 	GetAll() ([]model.Booking, error)
 	GetAllByStatus(status string) ([]model.Booking, error)
 	UpdateStatus(id string, approval string) (model.Booking, error)
+	GetReport() ([]model.Booking, error)
 }
 
 type bookingRepository struct {
 	db *sql.DB
+}
+
+func (b *bookingRepository) GetReport() ([]model.Booking, error) {
+	var result []model.Booking
+	_, err := b.db.Exec(common.DownloadReport, result)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }
 
 // UpdateStatus implements BookingRepository.
@@ -73,7 +84,7 @@ func (b *bookingRepository) GetAllByStatus(status string) ([]model.Booking, erro
 	booking b JOIN users u ON u.id = b.userid JOIN booking_details bd ON bd.bookingid = b.id WHERE status = $1`, status)
 
 	if err != nil {
-		return nil, fmt.Errorf("Can't find data with status : %s", status)
+		return nil, fmt.Errorf("can't find data with status : %s", status)
 	}
 
 	defer rows.Close()
@@ -108,7 +119,7 @@ func (b *bookingRepository) GetAllByStatus(status string) ([]model.Booking, erro
 	}
 
 	if len(bookings) == 0 {
-		return nil, fmt.Errorf("Can't find data with status: %s", status)
+		return nil, fmt.Errorf("can't find data with status: %s", status)
 	}
 	return bookings, nil
 }

@@ -88,6 +88,16 @@ func (b *BookingController) getAllHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "Ok", rspPayload)
 }
 
+func (b *BookingController) getReportHandler(ctx *gin.Context) {
+	rspPayload, err := b.uc.DownloadReport()
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(ctx, "Ok", rspPayload)
+}
+
 func (b *BookingController) Route() {
 	bc := b.rg.Group(config.BookingGroup)
 	bc.POST(config.BookingPost, b.createHandler)
@@ -95,6 +105,8 @@ func (b *BookingController) Route() {
 	bc.GET(config.BookingGetAll, b.getAllHandler)
 	bc.GET(config.BookingGet, b.getHandler)
 	bc.GET(config.BookingGetAllByStatus, b.getByStatusHandler)
+	bc.GET(config.DownloadReport, b.getReportHandler)
+
 }
 
 func NewBookingController(

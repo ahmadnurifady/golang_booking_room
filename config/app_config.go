@@ -3,6 +3,8 @@ package config
 const (
 	UserSesion = "user"
 
+	DownloadReport = "/download"
+
 	UserGroup  = "/users"
 	UserPost   = "/"
 	UserGet    = "/:id"
