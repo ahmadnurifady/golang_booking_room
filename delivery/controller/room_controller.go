@@ -86,13 +86,13 @@ func (r *RoomController) deleteHandler(ctx *gin.Context) {
 		return
 	}
 
-	err := r.uc.DeleteById(id)
+	_, err := r.uc.DeleteById(id)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
 		return
 	}
 
-	common.SendSingleResponse(ctx, "ok", err)
+	common.SendSingleResponse(ctx, "ok", nil)
 }
 
 func (r *RoomController) updateHandler(ctx *gin.Context) {
@@ -103,13 +103,13 @@ func (r *RoomController) updateHandler(ctx *gin.Context) {
 	}
 
 	var roomUpdate model.Room
-	err := ctx.ShouldBind(&roomUpdate)
+	err := ctx.ShouldBindJSON(&roomUpdate)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	roomUpdate, err = r.uc.UpdateById(id)
+	roomUpdate, err = r.uc.UpdateById(roomUpdate.Id, roomUpdate)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return

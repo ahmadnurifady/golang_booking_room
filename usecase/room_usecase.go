@@ -11,8 +11,8 @@ type RoomUseCase interface {
 	FindById(id string) (model.Room, error)
 	FindByRoomType(roomType string) (model.Room, error)
 	ViewAllRooms() ([]model.Room, error)
-	DeleteById(id string) error
-	UpdateById(id string) (model.Room, error)
+	DeleteById(id string) (model.Room, error)
+	UpdateById(id string, payload model.Room) (model.Room, error)
 }
 
 type roomUseCase struct {
@@ -39,22 +39,19 @@ func (r *roomUseCase) FindByRoomType(roomType string) (model.Room, error) {
 }
 
 // UpdateById implements RoomUseCase.
-func (r *roomUseCase) UpdateById(id string) (model.Room, error) {
-	room, err := r.repo.Update(id)
-	if err != nil {
-		panic(err)
-	}
-	return room, err
+func (r *roomUseCase) UpdateById(id string, payload model.Room) (model.Room, error) {
+
+	return r.repo.Update(id, payload)
 }
 
 // DeleteById implements RoomUseCase.
-func (r *roomUseCase) DeleteById(id string) error {
-	err := r.repo.Delete(id)
+func (r *roomUseCase) DeleteById(id string) (model.Room, error) {
+	_, err := r.repo.Delete(id)
 	if err != nil {
-		panic(err)
+		return model.Room{}, err
 	}
 
-	return err
+	return model.Room{}, err
 }
 
 // FindById implements RoomUseCase.
