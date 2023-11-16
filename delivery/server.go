@@ -3,7 +3,11 @@ package delivery
 import (
 	"final-project/config"
 	"final-project/delivery/controller"
+
+	// "final-project/delivery/middleware"
 	"final-project/manager"
+	"final-project/usecase"
+	"final-project/utils/common"
 	"fmt"
 	"log"
 
@@ -11,12 +15,15 @@ import (
 )
 
 type Server struct {
-	uc     manager.UseCaseManager
-	engine *gin.Engine
-	host   string
+	uc         manager.UseCaseManager
+	auth       usecase.AuthUseCase
+	engine     *gin.Engine
+	host       string
+	jwtService common.JwtToken
 }
 
 func (s *Server) setupControllers() {
+	// authMiddlerware := middleware.NewAuthMiddleware(s.jwtService)
 	rg := s.engine.Group("/final/v1")
 	controller.NewRoomController(s.uc.RoomUsecase(), rg).Route()
 	controller.NewUserController(s.uc.UserUseCase(), rg).Route()
