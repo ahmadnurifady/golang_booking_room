@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"final-project/model"
-	"final-project/repository"
+	"final-project-booking-room/model"
+	"final-project-booking-room/repository"
 	"fmt"
 )
 

@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"final-project/config"
-	"final-project/model"
-	"final-project/usecase"
-	"final-project/utils/common"
+	"final-project-booking-room/config"
+	"final-project-booking-room/model"
+	"final-project-booking-room/usecase"
+	"final-project-booking-room/utils/common"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

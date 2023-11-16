@@ -1,4 +1,4 @@
-module final-project
+module final-project-booking-room
 
 go 1.21.1
 

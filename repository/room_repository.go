@@ -2,7 +2,7 @@ package repository
 
 import (
 	"database/sql"
-	"final-project/model"
+	"final-project-booking-room/model"
 	"time"
 )
 
