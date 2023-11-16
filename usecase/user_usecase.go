@@ -22,15 +22,19 @@ type userUseCase struct {
 
 // UpdateUserById implements UserUseCase.
 func (u *userUseCase) UpdateUserById(id string, payload model.User) (model.User, error) {
-	if !payload.IsValidRole() {
-		return model.User{}, errors.New("invalid role, role must admin or employee")
+	user, err := u.repo.GetById(id)
+	if err != nil {
+		return model.User{}, fmt.Errorf("user with ID %s not found", id)
 	}
-	newPassword, err := common.GeneratePasswordHash(payload.Password)
+
+	var updateUser model.User
+
+	updateUser, err = u.repo.UpdateUserById(user.Id, updateUser)
 	if err != nil {
 		return model.User{}, err
 	}
-	payload.Password = newPassword
-	return u.repo.UpdateUserById(id, payload)
+
+	return updateUser, nil
 }
 
 // ViewAllUser implements UserUseCase.
