@@ -61,7 +61,7 @@ CREATE TABLE booking_details(
     description             TEXT,
     CreatedAt               TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UpdatedAt               TIMESTAMP,
-    CONSTRAINT FK_bookingbooking FOREIGN KEY(bookingId) REFERENCES booking(id),
-    CONSTRAINT FK_bookingId FOREIGN KEY(roomId) REFERENCES rooms(id),
+    CONSTRAINT FK_bookingId FOREIGN KEY(bookingId) REFERENCES booking(id),
+    CONSTRAINT FK_roomId FOREIGN KEY(roomId) REFERENCES rooms(id),
 
 );

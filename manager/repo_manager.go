@@ -21,7 +21,6 @@ func (r *repoManager) BookingRepo() repository.BookingRepository {
 func (r *repoManager) RoomRepo() repository.RoomRepository {
 	return repository.NewRoomRepository(r.infra.Conn())
 }
-
 func (r *repoManager) UserRepo() repository.UserRepository {
 	return repository.NewUserRepository(r.infra.Conn())
 }

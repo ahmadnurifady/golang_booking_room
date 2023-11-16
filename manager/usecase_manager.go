@@ -21,7 +21,6 @@ func (u *useCaseManager) BookingUsecase() usecase.BookingUseCase {
 func (u *useCaseManager) RoomUsecase() usecase.RoomUseCase {
 	return usecase.NewRoomUseCase(u.repo.RoomRepo())
 }
-
 func (u *useCaseManager) UserUseCase() usecase.UserUseCase {
 	return usecase.NewUserUseCase(u.repo.UserRepo())
 }

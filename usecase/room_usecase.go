@@ -1,13 +1,23 @@
 package usecase
 
 import (
+<<<<<<< HEAD
 	"final-project-booking-room/model"
 	"final-project-booking-room/repository"
+=======
+	"final-project/model"
+	"final-project/repository"
+	"fmt"
+>>>>>>> master
 )
 
 type RoomUseCase interface {
 	RegisterNewRoom(payload model.Room) (model.Room, error)
 	FindById(id string) (model.Room, error)
+<<<<<<< HEAD
+=======
+	FindByRoomType(roomType string) (model.Room, error)
+>>>>>>> master
 	DeleteById(id string) error
 	UpdateById(id string) error
 }
@@ -16,6 +26,18 @@ type roomUseCase struct {
 	repo repository.RoomRepository
 }
 
+<<<<<<< HEAD
+=======
+// FindByRoomType implements RoomUseCase.
+func (r *roomUseCase) FindByRoomType(roomType string) (model.Room, error) {
+	findRoom, err := r.repo.GetByRoomType(roomType)
+	if err != nil {
+		return model.Room{}, fmt.Errorf("room with roomType %s not found", roomType)
+	}
+	return findRoom, err
+}
+
+>>>>>>> master
 // UpdateById implements RoomUseCase.
 func (r *roomUseCase) UpdateById(id string) error {
 	err := r.repo.Update(id)
@@ -39,7 +61,11 @@ func (r *roomUseCase) DeleteById(id string) error {
 func (r *roomUseCase) FindById(id string) (model.Room, error) {
 	findRoom, err := r.repo.Get(id)
 	if err != nil {
+<<<<<<< HEAD
 		panic(err)
+=======
+		return model.Room{}, fmt.Errorf("room with roomType %s not found", id)
+>>>>>>> master
 	}
 
 	return findRoom, err

@@ -3,9 +3,12 @@ package config
 const (
 	UserSesion = "user"
 
-	UserGroup = "/users"
-	UserPost  = "/"
-	UserGet   = "/:id"
+	UserGroup  = "/users"
+	UserPost   = "/"
+	UserGet    = "/:id"
+	UserDelete = "/:id"
+	UserGetAll = "/"
+	UserUpdate = "/"
 
 	BookingGroup          = "/booking"
 	BookingPost           = "/"

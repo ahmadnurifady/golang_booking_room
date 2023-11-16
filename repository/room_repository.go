@@ -2,14 +2,22 @@ package repository
 
 import (
 	"database/sql"
+<<<<<<< HEAD
 	"final-project-booking-room/model"
 	"fmt"
+=======
+	"final-project/model"
+>>>>>>> master
 	"time"
 )
 
 type RoomRepository interface {
 	Create(payload model.Room) (model.Room, error)
 	Get(id string) (model.Room, error)
+<<<<<<< HEAD
+=======
+	GetByRoomType(roomType string) (model.Room, error)
+>>>>>>> master
 	Delete(id string) error
 	Update(id string) error
 }
@@ -18,6 +26,42 @@ type roomRepository struct {
 	db *sql.DB
 }
 
+<<<<<<< HEAD
+=======
+// GetByRoomType implements RoomRepository.
+func (r *roomRepository) GetByRoomType(roomType string) (model.Room, error) {
+	var room model.Room
+	err := r.db.QueryRow(`SELECT r.id, r.roomtype, r.capacity, f.id, f.roomdescription, f.fwifi, f.fsoundsystem, f.fprojector, f.fscreenprojector, f.fchairs, f.ftables, f.fsoundproof, f.fsmonkingarea, f.ftelevison, f.fac, f.fbathroom, f.fcoffemaker, f.createdat, f.updatedat, r.status, r.createdat, r.updatedat FROM rooms AS r JOIN facilities AS f ON f.id = r.facilities WHERE r.roomtype = $1;`, roomType).Scan(
+		&room.Id,
+		&room.RoomType,
+		&room.MaxCapacity,
+		&room.Facility.Id,
+		&room.Facility.RoomDescription,
+		&room.Facility.Fwifi,
+		&room.Facility.FsoundSystem,
+		&room.Facility.Fprojector,
+		&room.Facility.FscreenProjector,
+		&room.Facility.Fchairs,
+		&room.Facility.Ftables,
+		&room.Facility.FsoundProof,
+		&room.Facility.FsmonkingArea,
+		&room.Facility.Ftelevison,
+		&room.Facility.FAc,
+		&room.Facility.Fbathroom,
+		&room.Facility.FcoffeMaker,
+		&room.Facility.CreatedAt,
+		&room.Facility.UpdatedAt,
+		&room.Status,
+		&room.CreatedAt,
+		&room.UpdatedAt,
+	)
+	if err != nil {
+		return model.Room{}, err
+	}
+	return room, err
+}
+
+>>>>>>> master
 // Update implements RoomRepository.
 func (r *roomRepository) Update(id string) error {
 	var room model.Room
@@ -72,7 +116,11 @@ func (r *roomRepository) Get(id string) (model.Room, error) {
 		&room.UpdatedAt,
 	)
 	if err != nil {
+<<<<<<< HEAD
 		panic(err)
+=======
+		return model.Room{}, err
+>>>>>>> master
 	}
 
 	return room, err
@@ -103,6 +151,7 @@ func (r *roomRepository) Create(payload model.Room) (model.Room, error) {
 		&roomFacility.UpdatedAt,
 	)
 	if err != nil {
+<<<<<<< HEAD
 		panic(err)
 	}
 
@@ -110,11 +159,22 @@ func (r *roomRepository) Create(payload model.Room) (model.Room, error) {
 	fmt.Println(roomFacility.Id)
 	room.Facility = roomFacility
 	fmt.Println(room.Facility.Id)
+=======
+		return model.Room{}, err
+	}
+
+	room.Facility.Id = roomFacility.Id
+	room.Facility = roomFacility
+>>>>>>> master
 
 	err = r.db.QueryRow(`INSERT INTO rooms (roomtype, capacity, facilities ,status, updatedat) VALUES ($1, $2, $3, $4, $5) RETURNING id, roomtype, capacity, status, createdat, updatedat`, payload.RoomType, payload.MaxCapacity, roomFacility.Id, payload.Status, time.Now()).Scan(
 		&room.Id, &room.RoomType, &room.MaxCapacity, &room.Status, &room.CreatedAt, &room.UpdatedAt)
 	if err != nil {
+<<<<<<< HEAD
 		panic(err.Error())
+=======
+		return model.Room{}, err
+>>>>>>> master
 	}
 
 	return room, err
