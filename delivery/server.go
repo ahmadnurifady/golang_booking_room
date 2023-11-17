@@ -20,16 +20,19 @@ type Server struct {
 	auth       usecase.AuthUseCase
 	engine     *gin.Engine
 	host       string
+	logService common.MyLogger
+
 	jwtService common.JwtToken
 }
 
 func (s *Server) setupControllers() {
+	s.engine.Use(middleware.NewLogMiddleware(s.logService).LogRequest())
 	authMiddlerware := middleware.NewAuthMiddleware(s.jwtService)
-	rg := s.engine.Group("/final/v1")
-	controller.NewRoomController(s.uc.RoomUsecase(), rg, authMiddlerware).Route()
+	rg := s.engine.Group("/api/v1")
 	controller.NewUserController(s.uc.UserUseCase(), rg).Route()
 	controller.NewBookingController(s.uc.BookingUsecase(), rg, authMiddlerware).Route()
 	controller.NewAuthController(s.auth, rg, s.jwtService).Route()
+	controller.NewRoomController(s.uc.RoomUsecase(), rg, authMiddlerware).Route()
 }
 
 func (s *Server) Run() {
@@ -54,11 +57,13 @@ func NewServer() *Server {
 	uc := manager.NewUseCaseManager(repo)
 	engine := gin.Default()
 	host := fmt.Sprintf(":%s", cfg.ApiPort)
+	logService := common.NewMyLogger(cfg.LogFileConfig)
 	jwtService := common.NewJwtToken(cfg.TokenConfig)
 	return &Server{
-		uc:     uc,
-		engine: engine,
-		host:   host,
+		uc:         uc,
+		engine:     engine,
+		host:       host,
+		logService: logService,
 		auth: usecase.NewAuthUseCase(uc.UserUseCase(),
 			jwtService),
 		jwtService: jwtService,

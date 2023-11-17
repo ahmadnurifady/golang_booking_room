@@ -27,11 +27,15 @@ type TokenConfig struct {
 	JwtSignatureKey []byte
 	JwtLifeTime     time.Duration
 }
+type LogFileConfig struct {
+	FilePath string
+}
 
 type Config struct {
 	ApiConfig
 	DbConfig
 	TokenConfig
+	LogFileConfig
 }
 
 func (c *Config) readConfig() error {
@@ -64,7 +68,13 @@ func (c *Config) readConfig() error {
 	}
 
 	if c.ApiPort == "" || c.Host == "" || c.Port == "" || c.Name == "" || c.User == "" || c.IssuerName == "" || c.JwtSignatureKey == nil || c.JwtLifeTime == 0 {
-		return errors.New("missing required environment variables")
+		c.LogFileConfig = LogFileConfig{
+			FilePath: os.Getenv("LOG_FILE"),
+		}
+
+		if c.ApiPort == "" || c.Host == "" || c.Port == "" || c.Name == "" || c.User == "" || c.Password == "" || c.Driver == "" {
+			return errors.New("missing required environment variables")
+		}
 	}
 
 	return nil

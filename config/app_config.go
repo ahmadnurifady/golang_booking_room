@@ -33,6 +33,7 @@ const (
 	RoomGetByroomType = "/" //query
 	RoomGetAll        = "/get"
 	RoomGetById       = "/:id"
+	RoomGetByStatus   = "/status"
 	RoomDelete        = "/:id"
 	RoomUpdate        = "/:id"
 	RoomUpdateStatus  = "/status/:id"

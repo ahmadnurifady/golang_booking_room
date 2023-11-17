@@ -14,11 +14,62 @@ type RoomRepository interface {
 	Delete(id string) (model.Room, error)
 	Update(id string, payload model.Room) (model.Room, error)
 	GetStatus(id string) (string, error)
+	GetStatusByBd(id string) (string, error)
 	ChangeStatus(id string) error
+	GetAllRoomByStatus(status string) ([]model.Room, error)
 }
 
 type roomRepository struct {
 	db *sql.DB
+}
+
+// GetAllRoomByStatus
+func (r *roomRepository) GetAllRoomByStatus(status string) ([]model.Room, error) {
+	var rooms []model.Room
+
+	rows, err := r.db.Query(`SELECT r.id, r.roomtype, r.capacity, f.id, f.roomdescription, f.fwifi, f.fsoundsystem, f.fprojector, f.fscreenprojector, f.fchairs, f.ftables, f.fsoundproof, f.fsmonkingarea, f.ftelevison, f.fac, f.fbathroom, f.fcoffemaker, f.createdat, f.updatedat, r.status, r.createdat, r.updatedat FROM rooms AS r JOIN facilities AS f ON f.id = r.facilities WHERE r.status = $1`, status)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var room model.Room
+		err := rows.Scan(
+			&room.Id,
+			&room.RoomType,
+			&room.MaxCapacity,
+			&room.Facility.Id,
+			&room.Facility.RoomDescription,
+			&room.Facility.Fwifi,
+			&room.Facility.FsoundSystem,
+			&room.Facility.Fprojector,
+			&room.Facility.FscreenProjector,
+			&room.Facility.Fchairs,
+			&room.Facility.Ftables,
+			&room.Facility.FsoundProof,
+			&room.Facility.FsmonkingArea,
+			&room.Facility.Ftelevison,
+			&room.Facility.FAc,
+			&room.Facility.Fbathroom,
+			&room.Facility.FcoffeMaker,
+			&room.Facility.CreatedAt,
+			&room.Facility.UpdatedAt,
+			&room.Status,
+			&room.CreatedAt,
+			&room.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		rooms = append(rooms, room)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return rooms, err
+
 }
 
 // GetAllRoom implements RoomRepository.
@@ -79,10 +130,20 @@ func (r *roomRepository) ChangeStatus(id string) error {
 	return err
 }
 
-// getRoomStatus implements RoomRepository.
-func (r *roomRepository) GetStatus(roomId string) (string, error) {
+// GetStatusByBd implements RoomRepository.
+func (r *roomRepository) GetStatusByBd(bdId string) (string, error) {
 	var status string
-	err := r.db.QueryRow("SELECT status FROM rooms WHERE id = $1", roomId).Scan(&status)
+	err := r.db.QueryRow("SELECT r.status FROM rooms r JOIN booking_details bd ON bd.roomid = r.id WHERE bd.id = $1", bdId).Scan(&status)
+	if err != nil {
+		return "Can't get room status from booking_details ID", err
+	}
+	return status, nil
+}
+
+// getRoomStatus implements RoomRepository.
+func (r *roomRepository) GetStatus(id string) (string, error) {
+	var status string
+	err := r.db.QueryRow("SELECT status FROM rooms WHERE id = $1", id).Scan(&status)
 	if err != nil {
 		return "Can't get room status", err
 	}

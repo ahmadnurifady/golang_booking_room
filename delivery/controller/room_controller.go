@@ -34,6 +34,21 @@ func (r *RoomController) createHandler(ctx *gin.Context) {
 	common.SendCreateResponse(ctx, "ok", createRoom)
 }
 
+func (r *RoomController) getAllRoomByStatus(ctx *gin.Context) {
+	status := ctx.Query("status")
+	if status == "" {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "status cant be empty")
+		return
+	}
+	rspPayload, err := r.uc.GetAllRoomByStatus(status)
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(ctx, "Ok", rspPayload)
+}
+
 func (r *RoomController) getAllRoom(ctx *gin.Context) {
 	rspPayload, err := r.uc.ViewAllRooms()
 	if err != nil {
@@ -143,13 +158,26 @@ func (r *RoomController) updateHandler(ctx *gin.Context) {
 
 func (r *RoomController) Route() {
 	br := r.rg.Group(config.RoomGroup)
-	br.POST(config.RoomPost, r.createHandler)
-	br.GET(config.RoomGetByroomType, r.getByRoomtypeHandler)
-	br.GET(config.RoomGetAll, r.authMiddleware.RequireToken("admin"), r.getAllRoom)
-	br.GET(config.RoomGetById, r.getHandler)
-	br.DELETE(config.RoomDelete, r.authMiddleware.RequireToken("admin"), r.deleteHandler)
-	br.PUT(config.RoomUpdate, r.authMiddleware.RequireToken("admin"), r.updateHandler)
-	br.PUT(config.RoomUpdateStatus, r.changeStatusHandler)
+
+	br.POST(config.RoomPost, r.authMiddleware.RequireToken("admin"), r.createHandler) //ADMIN
+
+	br.GET(config.RoomGetByroomType, r.authMiddleware.RequireToken("admin", "GA"), r.getByRoomtypeHandler)
+	//ADMIN GA
+
+	br.GET(config.RoomGetAll, r.authMiddleware.RequireToken("admin", "GA"), r.getAllRoom) //admin GA
+
+	br.GET(config.RoomGetById, r.authMiddleware.RequireToken("admin", "GA"), r.getHandler) //ADMIN GA
+
+	br.DELETE(config.RoomDelete, r.authMiddleware.RequireToken("admin"), r.deleteHandler) //ADMIN
+
+	br.PUT(config.RoomUpdate, r.authMiddleware.RequireToken("admin", "GA"), r.updateHandler) //ADMIN GA
+
+	br.PUT(config.RoomUpdateStatus, r.authMiddleware.RequireToken("GA"), r.changeStatusHandler)
+	//GA
+
+	br.GET(config.RoomGetByStatus, r.authMiddleware.RequireToken("employee"), r.getAllRoomByStatus)
+
+	//ChangeRoomStatus(id string) //USER
 }
 
 func NewRoomController(uc usecase.RoomUseCase, rg *gin.RouterGroup, authmiddleware middleware.AuthMiddleware) *RoomController {
