@@ -91,7 +91,7 @@ func (b *BookingController) getAllHandler(ctx *gin.Context) {
 }
 
 func (b *BookingController) Route() {
-	bc := b.rg.Group(config.BookingGroup)
+	bc := b.rg.Group(config.BookingGroup, b.authMiddleware.RequireToken("admin", "GA", "employee"))
 	bc.POST(config.BookingPost, b.createHandler)
 	bc.PUT(config.Approval, b.UpdateStatusHandler)
 	bc.GET(config.BookingGetAll, b.getAllHandler)
