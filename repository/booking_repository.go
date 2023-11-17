@@ -250,13 +250,13 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 
 		// convert booking date end, 3 hari setelah start
 		now := time.Now()
-		threeDays := 3 * 24 * time.Hour
-		threeDaysLater := now.Add(threeDays)
+		threeHours := 3 * time.Hour
+		threeHoursLater := now.Add(threeHours)
 
 		// status awal booking : pending
 		bdStatus := "pending"
 
-		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.Rooms.Id, time.Now(), threeDaysLater, bdStatus, v.Description, time.Now()).Scan(
+		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.Rooms.Id, time.Now(), threeHoursLater, bdStatus, v.Description, time.Now()).Scan(
 			&bookingDetail.Id,
 			&bookingDetail.BookingId,
 			&bookingDetail.Rooms.Id,
