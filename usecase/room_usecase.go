@@ -13,6 +13,7 @@ type RoomUseCase interface {
 	DeleteById(id string) error
 	UpdateById(id string) error
 	GetRoomStatus(id string) (string, error)
+	GetRoomStatusByBdId(id string) (string, error)
 	ChangeRoomStatus(id string) error
 }
 
@@ -28,6 +29,15 @@ func (r *roomUseCase) ChangeRoomStatus(id string) error {
 	}
 
 	return err
+}
+
+// GetRoomStatusByBdId implements RoomUseCase.
+func (r *roomUseCase) GetRoomStatusByBdId(id string) (string, error) {
+	getStatus, err := r.repo.GetStatusByBd(id)
+	if err != nil {
+		return "Can't get room status from booking details ID", fmt.Errorf("room with booking details id %s not found", id)
+	}
+	return getStatus, err
 }
 
 // GetRoomStatus implements RoomUseCase.

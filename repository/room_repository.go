@@ -13,6 +13,7 @@ type RoomRepository interface {
 	Delete(id string) error
 	Update(id string) error
 	GetStatus(id string) (string, error)
+	GetStatusByBd(id string) (string, error)
 	ChangeStatus(id string) error
 }
 
@@ -30,10 +31,20 @@ func (r *roomRepository) ChangeStatus(id string) error {
 	return err
 }
 
-// getRoomStatus implements RoomRepository.
-func (r *roomRepository) GetStatus(roomId string) (string, error) {
+// GetStatusByBd implements RoomRepository.
+func (r *roomRepository) GetStatusByBd(bdId string) (string, error) {
 	var status string
-	err := r.db.QueryRow("SELECT status FROM rooms WHERE id = $1", roomId).Scan(&status)
+	err := r.db.QueryRow("SELECT r.status FROM rooms r JOIN booking_details bd ON bd.roomid = r.id WHERE bd.id = $1", bdId).Scan(&status)
+	if err != nil {
+		return "Can't get room status from booking_details ID", err
+	}
+	return status, nil
+}
+
+// getRoomStatus implements RoomRepository.
+func (r *roomRepository) GetStatus(id string) (string, error) {
+	var status string
+	err := r.db.QueryRow("SELECT status FROM rooms WHERE id = $1", id).Scan(&status)
 	if err != nil {
 		return "Can't get room status", err
 	}
