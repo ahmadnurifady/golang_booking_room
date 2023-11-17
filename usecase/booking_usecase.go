@@ -29,35 +29,49 @@ func (b *bookingUseCase) DownloadReport() ([]model.Booking, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	file, err := os.Create("Report.csv")
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
+
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	header := []string{"ID", "Name", "Divisi", "Jabatan", "Email"}
+	header := []string{"ID", "Name", "Divisi", "Jabatan", "Email", "RoomType", "BookingDate", "BookingDateEnd", "Status", "Description"}
 	err = writer.Write(header)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, row := range bookings {
-		data := []string{
-			fmt.Sprintf("%s", row.Id),
-			row.Users.Name,
-			row.Users.Divisi,
-			row.Users.Jabatan,
-			row.Users.Email,
+		// Fetch details for each booking
+		bookingDetails, err := b.repo.GetBookingDetailsByBookingID(row.Id)
+		if err != nil {
+			return nil, err
 		}
 
-		if err := writer.Write(data); err != nil {
-			return nil, err
+		for _, v := range bookingDetails {
+			data := []string{
+				row.Id,
+				row.Users.Name,
+				row.Users.Divisi,
+				row.Users.Jabatan,
+				row.Users.Email,
+				v.Rooms.RoomType,
+				v.BookingDate.Format("2006-01-02"),
+				v.BookingDateEnd.Format("2006-01-02"),
+				v.Rooms.Status,
+				v.Description,
+			}
+
+			if err := writer.Write(data); err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	// Assuming bookings is the correct slice to return
 	return bookings, nil
 }
 

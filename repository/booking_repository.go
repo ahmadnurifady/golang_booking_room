@@ -14,6 +14,7 @@ type BookingRepository interface {
 	GetAll() ([]model.Booking, error)
 	GetAllByStatus(status string) ([]model.Booking, error)
 	UpdateStatus(id string, approval string) (model.Booking, error)
+	GetBookingDetailsByBookingID(bookingID string) ([]model.BookingDetail, error)
 	GetReport() ([]model.Booking, error)
 }
 
@@ -109,7 +110,7 @@ func (b *bookingRepository) GetAllByStatus(status string) ([]model.Booking, erro
 		}
 
 		// Ambil data booking_details untuk setiap booking
-		bookingDetails, err := b.getBookingDetailsByBookingID(booking.Id)
+		bookingDetails, err := b.GetBookingDetailsByBookingID(booking.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -158,7 +159,7 @@ func (b *bookingRepository) GetAll() ([]model.Booking, error) {
 		}
 
 		// Ambil data booking_details untuk setiap booking
-		bookingDetails, err := b.getBookingDetailsByBookingID(booking.Id)
+		bookingDetails, err := b.GetBookingDetailsByBookingID(booking.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -170,7 +171,7 @@ func (b *bookingRepository) GetAll() ([]model.Booking, error) {
 	return bookings, nil
 }
 
-func (b *bookingRepository) getBookingDetailsByBookingID(bookingID string) ([]model.BookingDetail, error) {
+func (b *bookingRepository) GetBookingDetailsByBookingID(bookingID string) ([]model.BookingDetail, error) {
 	var bookingDetails []model.BookingDetail
 
 	rows, err := b.db.Query(`SELECT bd.id, bd.bookingdate, bd.bookingdateend, bd.status, bd.description, bd.createdat, bd.updatedat, r.id, r.roomtype, r.capacity, r.status, r.createdat, r.updatedat, f.id, f.roomdescription, f.fwifi, f.fsoundsystem, f.fprojector, f.fchairs, f.ftables, f.fsoundproof, f.fsmonkingarea, f.ftelevison, f.fac, f.fbathroom, f.fcoffemaker, f.createdat, f.updatedat
@@ -314,7 +315,7 @@ func (b *bookingRepository) Get(id string) (model.Booking, error) {
 	}
 
 	// Menggunakan getBookingDetailsByBookingID untuk mendapatkan data booking details
-	bookingDetails, err := b.getBookingDetailsByBookingID(id)
+	bookingDetails, err := b.GetBookingDetailsByBookingID(id)
 	if err != nil {
 		return model.Booking{}, err
 	}
