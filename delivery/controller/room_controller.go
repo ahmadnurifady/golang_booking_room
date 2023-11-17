@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"final-project-booking-room/config"
+	"final-project-booking-room/delivery/middleware"
 	"final-project-booking-room/model"
 	"final-project-booking-room/usecase"
 	"final-project-booking-room/utils/common"
@@ -11,8 +13,9 @@ import (
 )
 
 type RoomController struct {
-	uc usecase.RoomUseCase
-	rg *gin.RouterGroup
+	uc             usecase.RoomUseCase
+	rg             *gin.RouterGroup
+	authMiddleware middleware.AuthMiddleware
 }
 
 func (r *RoomController) createHandler(ctx *gin.Context) {
@@ -29,6 +32,31 @@ func (r *RoomController) createHandler(ctx *gin.Context) {
 		return
 	}
 	common.SendCreateResponse(ctx, "ok", createRoom)
+}
+
+func (r *RoomController) getAllRoomByStatus(ctx *gin.Context) {
+	status := ctx.Query("status")
+	if status == "" {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "status cant be empty")
+		return
+	}
+	rspPayload, err := r.uc.GetAllRoomByStatus(status)
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(ctx, "Ok", rspPayload)
+}
+
+func (r *RoomController) getAllRoom(ctx *gin.Context) {
+	rspPayload, err := r.uc.ViewAllRooms()
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(ctx, "Ok", rspPayload)
 }
 
 func (r *RoomController) getHandler(ctx *gin.Context) {
@@ -48,12 +76,14 @@ func (r *RoomController) getHandler(ctx *gin.Context) {
 
 func (r *RoomController) getByRoomtypeHandler(ctx *gin.Context) {
 	roomType := ctx.Query("roomtype")
-	// var rspPayload model.Room
-	// var err error
 
 	if roomType == "" {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "roomtype cant be empty")
-		return
+		getAll, err := r.uc.ViewAllRooms()
+		if err != nil {
+			common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+			return
+		}
+		common.SendSingleResponse(ctx, "Ok", getAll)
 	}
 	rspPayload, err := r.uc.FindByRoomType(roomType)
 	if err != nil {
@@ -73,13 +103,13 @@ func (r *RoomController) deleteHandler(ctx *gin.Context) {
 		return
 	}
 
-	err := r.uc.DeleteById(id)
+	_, err := r.uc.DeleteById(id)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
 		return
 	}
 
-	common.SendSingleResponse(ctx, "ok", err)
+	common.SendSingleResponse(ctx, "ok", nil)
 }
 
 func (r *RoomController) changeStatusHandler(ctx *gin.Context) {
@@ -99,38 +129,55 @@ func (r *RoomController) changeStatusHandler(ctx *gin.Context) {
 }
 
 func (r *RoomController) updateHandler(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id == "" {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
+		return
+	}
+
 	var roomUpdate model.Room
-	err := ctx.ShouldBind(&roomUpdate)
+
+	roomUpdate.Id = id
+
+	err := ctx.ShouldBindJSON(&roomUpdate)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	id := ctx.Param("id")
-	if id == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "id tidak ditemukan"})
-		return
-	}
-
-	err = r.uc.DeleteById(id)
+	roomUpdate, err = r.uc.UpdateById(roomUpdate.Id, roomUpdate)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "product telah diupdate", "data": roomUpdate})
+	common.SendSingleResponse(ctx, "Ok", roomUpdate)
 }
 
 func (r *RoomController) Route() {
-	br := r.rg.Group("/rooms")
-	br.POST("/create", r.createHandler)
-	br.GET("/:id", r.getHandler)
-	br.GET("/", r.getByRoomtypeHandler)
-	br.DELETE("/:id", r.deleteHandler)
-	br.PUT(":id", r.updateHandler)
-	br.PUT("/status/:id", r.changeStatusHandler)
+	br := r.rg.Group(config.RoomGroup)
+
+	br.POST(config.RoomPost, r.authMiddleware.RequireToken("admin"), r.createHandler) //ADMIN
+
+	br.GET(config.RoomGetByroomType, r.authMiddleware.RequireToken("admin", "GA"), r.getByRoomtypeHandler)
+	//ADMIN GA
+
+	br.GET(config.RoomGetAll, r.authMiddleware.RequireToken("admin", "GA"), r.getAllRoom) //admin GA
+
+	br.GET(config.RoomGetById, r.authMiddleware.RequireToken("admin", "GA"), r.getHandler) //ADMIN GA
+
+	br.DELETE(config.RoomDelete, r.authMiddleware.RequireToken("admin"), r.deleteHandler) //ADMIN
+
+	br.PUT(config.RoomUpdate, r.authMiddleware.RequireToken("admin", "GA"), r.updateHandler) //ADMIN GA
+
+	br.PUT(config.RoomUpdateStatus, r.authMiddleware.RequireToken("GA"), r.changeStatusHandler)
+	//GA
+
+	br.GET(config.RoomGetByStatus, r.authMiddleware.RequireToken("employee"), r.getAllRoomByStatus)
+
+	//ChangeRoomStatus(id string) //USER
 }
 
-func NewRoomController(uc usecase.RoomUseCase, rg *gin.RouterGroup) *RoomController {
-	return &RoomController{uc: uc, rg: rg}
+func NewRoomController(uc usecase.RoomUseCase, rg *gin.RouterGroup, authmiddleware middleware.AuthMiddleware) *RoomController {
+	return &RoomController{uc: uc, rg: rg, authMiddleware: authmiddleware}
 }

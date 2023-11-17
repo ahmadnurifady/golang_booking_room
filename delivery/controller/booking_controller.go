@@ -2,6 +2,7 @@ package controller
 
 import (
 	"final-project-booking-room/config"
+	"final-project-booking-room/delivery/middleware"
 	"final-project-booking-room/model/dto"
 	"final-project-booking-room/usecase"
 	"final-project-booking-room/utils/common"
@@ -11,8 +12,9 @@ import (
 )
 
 type BookingController struct {
-	uc usecase.BookingUseCase
-	rg *gin.RouterGroup
+	uc             usecase.BookingUseCase
+	rg             *gin.RouterGroup
+	authMiddleware middleware.AuthMiddleware
 }
 
 func (b *BookingController) createHandler(ctx *gin.Context) {
@@ -100,8 +102,10 @@ func (b *BookingController) Route() {
 func NewBookingController(
 	uc usecase.BookingUseCase,
 	rg *gin.RouterGroup,
+	authMiddleware middleware.AuthMiddleware,
 ) *BookingController {
 	return &BookingController{
-		uc: uc,
-		rg: rg}
+		uc:             uc,
+		rg:             rg,
+		authMiddleware: authMiddleware}
 }

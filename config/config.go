@@ -3,6 +3,8 @@ package config
 import (
 	"errors"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -20,6 +22,11 @@ type DbConfig struct {
 	Driver   string
 }
 
+type TokenConfig struct {
+	IssuerName      string
+	JwtSignatureKey []byte
+	JwtLifeTime     time.Duration
+}
 type LogFileConfig struct {
 	FilePath string
 }
@@ -27,6 +34,7 @@ type LogFileConfig struct {
 type Config struct {
 	ApiConfig
 	DbConfig
+	TokenConfig
 	LogFileConfig
 }
 
@@ -48,12 +56,25 @@ func (c *Config) readConfig() error {
 		Driver:   os.Getenv("DB_DRIVER"),
 	}
 
-	c.LogFileConfig = LogFileConfig{
-		FilePath: os.Getenv("LOG_FILE"),
+	tokenLifeTime, err := strconv.Atoi(os.Getenv("TOKEN_LIFE_TIME"))
+	if err != nil {
+		return err
 	}
 
-	if c.ApiPort == "" || c.Host == "" || c.Port == "" || c.Name == "" || c.User == "" || c.Password == "" || c.Driver == "" {
-		return errors.New("missing required environment variables")
+	c.TokenConfig = TokenConfig{
+		IssuerName:      os.Getenv("TOKEN_ISSUE_NAME"),
+		JwtSignatureKey: []byte(os.Getenv("TOKEN_KEY")),
+		JwtLifeTime:     time.Duration(tokenLifeTime) * time.Hour,
+	}
+
+	if c.ApiPort == "" || c.Host == "" || c.Port == "" || c.Name == "" || c.User == "" || c.IssuerName == "" || c.JwtSignatureKey == nil || c.JwtLifeTime == 0 {
+		c.LogFileConfig = LogFileConfig{
+			FilePath: os.Getenv("LOG_FILE"),
+		}
+
+		if c.ApiPort == "" || c.Host == "" || c.Port == "" || c.Name == "" || c.User == "" || c.Password == "" || c.Driver == "" {
+			return errors.New("missing required environment variables")
+		}
 	}
 
 	return nil
