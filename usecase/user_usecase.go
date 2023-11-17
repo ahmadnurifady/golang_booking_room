@@ -77,7 +77,7 @@ func (u *userUseCase) RegisterNewUser(payload model.User) (model.User, error) {
 		bodySender := modelutil.BodySender{
 			To:      []string{payload.Email},
 			Subject: "Registrasi Akun",
-			Body:    "Akun anda sudah terdaftar sekarang anda dapat melakukan booking room.",
+			Body:    "Selamat ! Akun anda telah terdaftar. sekarang anda dapat melakukan Booking Room",
 		}
 		err := u.emailService.SendEmail(bodySender)
 		if err != nil {
