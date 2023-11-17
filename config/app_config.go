@@ -4,14 +4,15 @@ const (
 	//auth
 	UserSesion = "user"
 
-	UserAdmin = "08f0cea4-2d3e-40e6-b2ee-18c7ec5507d8"
+	DownloadReport = "/download"
+	UserAdmin      = "08f0cea4-2d3e-40e6-b2ee-18c7ec5507d8"
 
 	AuthGroup        = "/auth"
 	AuthRegister     = "/register"
 	AuthLogin        = "/login"
 	AuthRefreshToken = "/refresh-token"
 
-	//user
+	//User
 	UserGroup  = "/users"
 	UserPost   = "/"
 	UserGet    = "/:id"

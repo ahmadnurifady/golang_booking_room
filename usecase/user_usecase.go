@@ -5,6 +5,7 @@ import (
 	"final-project-booking-room/model"
 	"final-project-booking-room/repository"
 	"final-project-booking-room/utils/common"
+	"final-project-booking-room/utils/modelutil"
 	"fmt"
 )
 
@@ -18,7 +19,8 @@ type UserUseCase interface {
 }
 
 type userUseCase struct {
-	repo repository.UserRepository
+	repo         repository.UserRepository
+	emailService common.EmailService
 }
 
 func (u *userUseCase) FindByEmailPassword(email string, password string) (model.User, error) {
@@ -38,15 +40,19 @@ func (u *userUseCase) FindByEmailPassword(email string, password string) (model.
 
 // UpdateUserById implements UserUseCase.
 func (u *userUseCase) UpdateUserById(id string, payload model.User) (model.User, error) {
-	if !payload.IsValidRole() {
-		return model.User{}, errors.New("invalid role, role must admin or employee")
+	user, err := u.repo.GetById(id)
+	if err != nil {
+		return model.User{}, fmt.Errorf("user with ID %s not found", id)
 	}
-	newPassword, err := common.GeneratePasswordHash(payload.Password)
+
+	var updateUser model.User
+
+	updateUser, err = u.repo.UpdateUserById(user.Id, updateUser)
 	if err != nil {
 		return model.User{}, err
 	}
-	payload.Password = newPassword
-	return u.repo.UpdateUserById(id, payload)
+
+	return updateUser, nil
 }
 
 // ViewAllUser implements UserUseCase.
@@ -82,11 +88,24 @@ func (u *userUseCase) RegisterNewUser(payload model.User) (model.User, error) {
 	if err != nil {
 		return model.User{}, err
 	}
+
+	if payload.Email != "" && payload.Password != "" {
+		bodySender := modelutil.BodySender{
+			To:      []string{payload.Email},
+			Subject: "Registrasi Akun",
+			Body:    "Selamat ! Akun anda telah terdaftar. sekarang anda dapat melakukan Booking Room",
+		}
+		err := u.emailService.SendEmail(bodySender)
+		if err != nil {
+			return model.User{}, err
+		}
+	}
+
 	payload.Password = newPassword
 	return u.repo.Create(payload)
 
 }
 
-func NewUserUseCase(repo repository.UserRepository) UserUseCase {
-	return &userUseCase{repo: repo}
+func NewUserUseCase(repo repository.UserRepository, email common.EmailService) UserUseCase {
+	return &userUseCase{repo: repo, emailService: email}
 }

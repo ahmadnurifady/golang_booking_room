@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"final-project-booking-room/model"
+	"final-project-booking-room/utils/common"
 	"fmt"
 	"time"
 )
@@ -14,6 +15,8 @@ type BookingRepository interface {
 	GetAllByStatus(status string) ([]model.Booking, error)
 	UpdateStatus(id string, approval string) (model.Booking, error)
 	GetBookStatus(id string) (string, error)
+	GetBookingDetailsByBookingID(bookingID string) ([]model.BookingDetail, error)
+	GetReport() ([]model.Booking, error)
 }
 
 type bookingRepository struct {
@@ -28,6 +31,15 @@ func (b *bookingRepository) GetBookStatus(id string) (string, error) {
 		return "Can't get booking detail status", err
 	}
 	return status, nil
+}
+
+func (b *bookingRepository) GetReport() ([]model.Booking, error) {
+	var result []model.Booking
+	_, err := b.db.Exec(common.DownloadReport, result)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }
 
 // UpdateStatus implements BookingRepository.
@@ -82,7 +94,7 @@ func (b *bookingRepository) GetAllByStatus(status string) ([]model.Booking, erro
 	booking b JOIN users u ON u.id = b.userid JOIN booking_details bd ON bd.bookingid = b.id WHERE status = $1`, status)
 
 	if err != nil {
-		return nil, fmt.Errorf("Can't find data with status : %s", status)
+		return nil, fmt.Errorf("can't find data with status : %s", status)
 	}
 
 	defer rows.Close()
@@ -107,7 +119,7 @@ func (b *bookingRepository) GetAllByStatus(status string) ([]model.Booking, erro
 		}
 
 		// Ambil data booking_details untuk setiap booking
-		bookingDetails, err := b.getBookingDetailsByBookingID(booking.Id)
+		bookingDetails, err := b.GetBookingDetailsByBookingID(booking.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -117,7 +129,7 @@ func (b *bookingRepository) GetAllByStatus(status string) ([]model.Booking, erro
 	}
 
 	if len(bookings) == 0 {
-		return nil, fmt.Errorf("Can't find data with status: %s", status)
+		return nil, fmt.Errorf("can't find data with status: %s", status)
 	}
 	return bookings, nil
 }
@@ -156,7 +168,7 @@ func (b *bookingRepository) GetAll() ([]model.Booking, error) {
 		}
 
 		// Ambil data booking_details untuk setiap booking
-		bookingDetails, err := b.getBookingDetailsByBookingID(booking.Id)
+		bookingDetails, err := b.GetBookingDetailsByBookingID(booking.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -168,7 +180,7 @@ func (b *bookingRepository) GetAll() ([]model.Booking, error) {
 	return bookings, nil
 }
 
-func (b *bookingRepository) getBookingDetailsByBookingID(bookingID string) ([]model.BookingDetail, error) {
+func (b *bookingRepository) GetBookingDetailsByBookingID(bookingID string) ([]model.BookingDetail, error) {
 	var bookingDetails []model.BookingDetail
 
 	rows, err := b.db.Query(`SELECT bd.id, bd.bookingdate, bd.bookingdateend, bd.status, bd.description, bd.createdat, bd.updatedat, r.id, r.roomtype, r.capacity, r.status, r.createdat, r.updatedat, f.id, f.roomdescription, f.fwifi, f.fsoundsystem, f.fprojector, f.fchairs, f.ftables, f.fsoundproof, f.fsmonkingarea, f.ftelevison, f.fac, f.fbathroom, f.fcoffemaker, f.createdat, f.updatedat
@@ -313,7 +325,7 @@ func (b *bookingRepository) Get(id string) (model.Booking, error) {
 	}
 
 	// Menggunakan getBookingDetailsByBookingID untuk mendapatkan data booking details
-	bookingDetails, err := b.getBookingDetailsByBookingID(id)
+	bookingDetails, err := b.GetBookingDetailsByBookingID(id)
 	if err != nil {
 		return model.Booking{}, err
 	}

@@ -54,7 +54,7 @@ func NewServer() *Server {
 	}
 
 	repo := manager.NewRepoManager(infra)
-	uc := manager.NewUseCaseManager(repo)
+	uc := manager.NewUseCaseManager(repo, common.NewEmailService(cfg))
 	engine := gin.Default()
 	host := fmt.Sprintf(":%s", cfg.ApiPort)
 	logService := common.NewMyLogger(cfg.LogFileConfig)

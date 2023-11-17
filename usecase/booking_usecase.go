@@ -1,9 +1,11 @@
 package usecase
 
 import (
+	"encoding/csv"
 	"final-project-booking-room/model"
 	"final-project-booking-room/model/dto"
 	"final-project-booking-room/repository"
+	"os"
 
 	"fmt"
 )
@@ -14,11 +16,63 @@ type BookingUseCase interface {
 	ViewAllBooking() ([]model.Booking, error)
 	ViewAllBookingByStatus(status string) ([]model.Booking, error)
 	UpdateStatusBookAndRoom(id string, approval string) (model.Booking, error)
+	DownloadReport() ([]model.Booking, error)
 }
 type bookingUseCase struct {
 	repo   repository.BookingRepository
 	userUC UserUseCase
 	roomUC RoomUseCase
+}
+
+func (b *bookingUseCase) DownloadReport() ([]model.Booking, error) {
+	bookings, err := b.repo.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	file, err := os.Create("Report.csv")
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	header := []string{"ID", "Name", "Divisi", "Jabatan", "Email", "RoomType", "BookingDate", "BookingDateEnd", "Status", "Description"}
+	err = writer.Write(header)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, row := range bookings {
+		// Fetch details for each booking
+		bookingDetails, err := b.repo.GetBookingDetailsByBookingID(row.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, v := range bookingDetails {
+			data := []string{
+				row.Id,
+				row.Users.Name,
+				row.Users.Divisi,
+				row.Users.Jabatan,
+				row.Users.Email,
+				v.Rooms.RoomType,
+				v.BookingDate.Format("2006-01-02"),
+				v.BookingDateEnd.Format("2006-01-02"),
+				v.Rooms.Status,
+				v.Description,
+			}
+
+			if err := writer.Write(data); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return bookings, nil
 }
 
 // UpdateStatusBookAndRoom implements BookingUseCase.
@@ -49,7 +103,7 @@ func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (mo
 
 	booking, err := b.repo.UpdateStatus(id, approval)
 	if err != nil {
-		return model.Booking{}, fmt.Errorf("Booking detail with ID %s not found", id)
+		return model.Booking{}, fmt.Errorf("booking detail with id %s not found", id)
 	}
 
 	return booking, nil
@@ -59,7 +113,7 @@ func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (mo
 func (b *bookingUseCase) ViewAllBookingByStatus(status string) ([]model.Booking, error) {
 	bookings, err := b.repo.GetAllByStatus(status)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get data, err: %v", err)
+		return nil, fmt.Errorf("failed to get data, err: %v", err)
 	}
 	return bookings, nil
 }
@@ -68,7 +122,7 @@ func (b *bookingUseCase) ViewAllBookingByStatus(status string) ([]model.Booking,
 func (b *bookingUseCase) ViewAllBooking() ([]model.Booking, error) {
 	bookings, err := b.repo.GetAll()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get all bookings: %v", err)
+		return nil, fmt.Errorf("failed to get all bookings: %v", err)
 	}
 	return bookings, nil
 }
@@ -77,7 +131,7 @@ func (b *bookingUseCase) ViewAllBooking() ([]model.Booking, error) {
 func (b *bookingUseCase) FindById(id string) (model.Booking, error) {
 	booking, err := b.repo.Get(id)
 	if err != nil {
-		return model.Booking{}, fmt.Errorf("Booking with ID %s not found", id)
+		return model.Booking{}, fmt.Errorf("booking with id %s not found", id)
 	}
 	return booking, nil
 }
