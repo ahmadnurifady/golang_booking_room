@@ -2,6 +2,7 @@ package manager
 
 import (
 	"final-project-booking-room/usecase"
+	"final-project-booking-room/utils/common"
 )
 
 type UseCaseManager interface {
@@ -11,7 +12,8 @@ type UseCaseManager interface {
 }
 
 type useCaseManager struct {
-	repo RepoManager
+	repo  RepoManager
+	email common.EmailService
 }
 
 // BookingUsecase implements UseCaseManager.
@@ -24,9 +26,9 @@ func (u *useCaseManager) RoomUsecase() usecase.RoomUseCase {
 	return usecase.NewRoomUseCase(u.repo.RoomRepo())
 }
 func (u *useCaseManager) UserUseCase() usecase.UserUseCase {
-	return usecase.NewUserUseCase(u.repo.UserRepo())
+	return usecase.NewUserUseCase(u.repo.UserRepo(), u.email)
 }
 
-func NewUseCaseManager(repo RepoManager) UseCaseManager {
-	return &useCaseManager{repo: repo}
+func NewUseCaseManager(repo RepoManager, email common.EmailService) UseCaseManager {
+	return &useCaseManager{repo: repo, email: email}
 }

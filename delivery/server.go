@@ -4,6 +4,7 @@ import (
 	"final-project-booking-room/config"
 	"final-project-booking-room/delivery/controller"
 	"final-project-booking-room/manager"
+	"final-project-booking-room/utils/common"
 	"fmt"
 	"log"
 
@@ -42,7 +43,7 @@ func NewServer() *Server {
 		log.Fatal(err)
 	}
 	repo := manager.NewRepoManager(infra)
-	uc := manager.NewUseCaseManager(repo)
+	uc := manager.NewUseCaseManager(repo, common.NewEmailService(cfg))
 	engine := gin.Default()
 	host := fmt.Sprintf(":%s", cfg.ApiPort)
 	return &Server{

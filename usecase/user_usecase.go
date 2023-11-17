@@ -5,6 +5,7 @@ import (
 	"final-project-booking-room/model"
 	"final-project-booking-room/repository"
 	"final-project-booking-room/utils/common"
+	"final-project-booking-room/utils/modelutil"
 	"fmt"
 )
 
@@ -17,7 +18,8 @@ type UserUseCase interface {
 }
 
 type userUseCase struct {
-	repo repository.UserRepository
+	repo         repository.UserRepository
+	emailService common.EmailService
 }
 
 // UpdateUserById implements UserUseCase.
@@ -70,11 +72,24 @@ func (u *userUseCase) RegisterNewUser(payload model.User) (model.User, error) {
 	if err != nil {
 		return model.User{}, err
 	}
+
+	if payload.Email != "" && payload.Password != "" {
+		bodySender := modelutil.BodySender{
+			To:      []string{payload.Email},
+			Subject: "Registrasi Customer",
+			Body:    "Selamat atas pendaftaran akun anda.",
+		}
+		err := u.emailService.SendEmail(bodySender)
+		if err != nil {
+			return model.User{}, err
+		}
+	}
+
 	payload.Password = newPassword
 	return u.repo.Create(payload)
 
 }
 
-func NewUserUseCase(repo repository.UserRepository) UserUseCase {
-	return &userUseCase{repo: repo}
+func NewUserUseCase(repo repository.UserRepository, email common.EmailService) UserUseCase {
+	return &userUseCase{repo: repo, emailService: email}
 }

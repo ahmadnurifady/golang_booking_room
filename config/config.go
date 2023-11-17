@@ -20,14 +20,29 @@ type DbConfig struct {
 	Driver   string
 }
 
+type EmailConfig struct {
+	Server    string
+	Port      string
+	EmailFrom string
+	Password  string
+}
+
 type Config struct {
 	ApiConfig
+	EmailConfig
 	DbConfig
 }
 
 func (c *Config) readConfig() error {
 	if err := godotenv.Load(); err != nil {
 		return err
+	}
+
+	c.EmailConfig = EmailConfig{
+		Server:    os.Getenv("EMAIL_SERVER"),
+		Port:      os.Getenv("EMAIL_PORT"),
+		EmailFrom: os.Getenv("EMAIL_FROM"),
+		Password:  os.Getenv("EMAIL_PASSWORD"),
 	}
 
 	c.ApiConfig = ApiConfig{
@@ -43,7 +58,9 @@ func (c *Config) readConfig() error {
 		Driver:   os.Getenv("DB_DRIVER"),
 	}
 
-	if c.ApiPort == "" || c.Host == "" || c.Port == "" || c.Name == "" || c.User == "" || c.Password == "" || c.Driver == "" {
+	if c.ApiPort == "" || c.DbConfig.Host == "" || c.DbConfig.Port == "" || c.DbConfig.Name == "" || c.DbConfig.User == "" ||
+		c.DbConfig.Password == "" || c.Driver == "" || c.EmailConfig.Server == "" || c.EmailConfig.Port == "" || c.EmailConfig.EmailFrom == "" ||
+		c.EmailConfig.Password == "" {
 		return errors.New("missing required environment variables")
 	}
 
