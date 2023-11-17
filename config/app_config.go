@@ -1,10 +1,18 @@
 package config
 
 const (
+	//auth
 	UserSesion = "user"
 
 	DownloadReport = "/download"
+	UserAdmin      = "08f0cea4-2d3e-40e6-b2ee-18c7ec5507d8"
 
+	AuthGroup        = "/auth"
+	AuthRegister     = "/register"
+	AuthLogin        = "/login"
+	AuthRefreshToken = "/refresh-token"
+
+	//User
 	UserGroup  = "/users"
 	UserPost   = "/"
 	UserGet    = "/:id"
@@ -12,6 +20,7 @@ const (
 	UserGetAll = "/"
 	UserUpdate = "/"
 
+	//booking
 	BookingGroup          = "/booking"
 	BookingPost           = "/"
 	BookingGet            = "/:id"
@@ -19,7 +28,14 @@ const (
 	BookingGetAllByStatus = "/status/:status"
 	Approval              = "/approval"
 
-	RoomGroup = "/rooms"
-	RoomPost  = "/"
-	RoomGet   = "/:id"
+	//room
+	RoomGroup         = "/rooms"
+	RoomPost          = "/create"
+	RoomGetByroomType = "/" //query
+	RoomGetAll        = "/get"
+	RoomGetById       = "/:id"
+	RoomGetByStatus   = "/status"
+	RoomDelete        = "/:id"
+	RoomUpdate        = "/:id"
+	RoomUpdateStatus  = "/status/:id"
 )

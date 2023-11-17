@@ -19,4 +19,5 @@ const (
 				JOIN users u ON b.userId = u.id
 				JOIN booking_details bd ON bd.bookingId = b.id
 				JOIN rooms r ON r.id = bd.roomId`
+	GetByEmail = `SELECT id, name, divisi, jabatan, email, password, role FROM users WHERE email = $1`
 )

@@ -14,12 +14,23 @@ type BookingRepository interface {
 	GetAll() ([]model.Booking, error)
 	GetAllByStatus(status string) ([]model.Booking, error)
 	UpdateStatus(id string, approval string) (model.Booking, error)
+	GetBookStatus(id string) (string, error)
 	GetBookingDetailsByBookingID(bookingID string) ([]model.BookingDetail, error)
 	GetReport() ([]model.Booking, error)
 }
 
 type bookingRepository struct {
 	db *sql.DB
+}
+
+// GetBookStatus implements BookingRepository.
+func (b *bookingRepository) GetBookStatus(id string) (string, error) {
+	var status string
+	err := b.db.QueryRow("SELECT status FROM booking_details WHERE id = $1", id).Scan(&status)
+	if err != nil {
+		return "Can't get booking detail status", err
+	}
+	return status, nil
 }
 
 func (b *bookingRepository) GetReport() ([]model.Booking, error) {
@@ -35,8 +46,6 @@ func (b *bookingRepository) GetReport() ([]model.Booking, error) {
 func (b *bookingRepository) UpdateStatus(id string, approval string) (model.Booking, error) {
 	var booking model.Booking
 
-	fmt.Println("id :", id)
-	fmt.Println("approval :", approval)
 	// Memulai transaksi
 	tx, err := b.db.Begin()
 	if err != nil {
@@ -256,9 +265,10 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 		threeDays := 3 * 24 * time.Hour
 		threeDaysLater := now.Add(threeDays)
 
-		fmt.Println("status :", v.Status)
-		fmt.Println("desc :", v.Description)
-		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.Rooms.Id, time.Now(), threeDaysLater, v.Status, v.Description, time.Now()).Scan(
+		// status awal booking : pending
+		bdStatus := "pending"
+
+		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.Rooms.Id, time.Now(), threeDaysLater, bdStatus, v.Description, time.Now()).Scan(
 			&bookingDetail.Id,
 			&bookingDetail.BookingId,
 			&bookingDetail.Rooms.Id,

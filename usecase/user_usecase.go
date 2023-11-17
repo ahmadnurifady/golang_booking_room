@@ -15,11 +15,27 @@ type UserUseCase interface {
 	DeleteUser(id string) (model.User, error)
 	ViewAllUser() ([]model.User, error)
 	UpdateUserById(id string, payload model.User) (model.User, error)
+	FindByEmailPassword(email string, password string) (model.User, error)
 }
 
 type userUseCase struct {
 	repo         repository.UserRepository
 	emailService common.EmailService
+}
+
+func (u *userUseCase) FindByEmailPassword(email string, password string) (model.User, error) {
+	user, err := u.repo.GetByEmail(email)
+	if err != nil {
+		return model.User{}, fmt.Errorf("user with email %s not found", email)
+	}
+
+	if err := common.ComparePasswordHash(user.Password, password); err != nil {
+		return model.User{}, err
+	}
+
+	user.Password = ""
+
+	return user, nil
 }
 
 // UpdateUserById implements UserUseCase.
