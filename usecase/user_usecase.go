@@ -76,8 +76,8 @@ func (u *userUseCase) RegisterNewUser(payload model.User) (model.User, error) {
 	if payload.Email != "" && payload.Password != "" {
 		bodySender := modelutil.BodySender{
 			To:      []string{payload.Email},
-			Subject: "Registrasi Customer",
-			Body:    "Selamat atas pendaftaran akun anda.",
+			Subject: "Registrasi Akun",
+			Body:    "Akun anda sudah terdaftar sekarang anda dapat melakukan booking room.",
 		}
 		err := u.emailService.SendEmail(bodySender)
 		if err != nil {
