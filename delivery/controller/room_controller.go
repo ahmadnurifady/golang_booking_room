@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"final-project-booking-room/config"
+	"final-project-booking-room/delivery/middleware"
 	"final-project-booking-room/model"
 	"final-project-booking-room/usecase"
 	"final-project-booking-room/utils/common"
@@ -11,8 +13,9 @@ import (
 )
 
 type RoomController struct {
-	uc usecase.RoomUseCase
-	rg *gin.RouterGroup
+	uc             usecase.RoomUseCase
+	rg             *gin.RouterGroup
+	authMiddleware middleware.AuthMiddleware
 }
 
 func (r *RoomController) createHandler(ctx *gin.Context) {
@@ -120,6 +123,9 @@ func (r *RoomController) updateHandler(ctx *gin.Context) {
 	}
 
 	var roomUpdate model.Room
+
+	roomUpdate.Id = id
+
 	err := ctx.ShouldBindJSON(&roomUpdate)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -136,16 +142,16 @@ func (r *RoomController) updateHandler(ctx *gin.Context) {
 }
 
 func (r *RoomController) Route() {
-	br := r.rg.Group("/rooms")
-	br.POST("/create", r.createHandler)
-	br.GET("/", r.getByRoomtypeHandler)
-	br.GET("/getall", r.getAllRoom)
-	br.GET("/:id", r.getHandler)
-	br.DELETE("/:id", r.deleteHandler)
-	br.PUT(":id", r.updateHandler)
-	br.PUT("/status/:id", r.changeStatusHandler)
+	br := r.rg.Group(config.RoomGroup)
+	br.POST(config.RoomPost, r.createHandler)
+	br.GET(config.RoomGetByroomType, r.getByRoomtypeHandler)
+	br.GET(config.RoomGetAll, r.authMiddleware.RequireToken("admin"), r.getAllRoom)
+	br.GET(config.RoomGetById, r.getHandler)
+	br.DELETE(config.RoomDelete, r.authMiddleware.RequireToken("admin"), r.deleteHandler)
+	br.PUT(config.RoomUpdate, r.authMiddleware.RequireToken("admin"), r.updateHandler)
+	br.PUT(config.RoomUpdateStatus, r.changeStatusHandler)
 }
 
-func NewRoomController(uc usecase.RoomUseCase, rg *gin.RouterGroup) *RoomController {
-	return &RoomController{uc: uc, rg: rg}
+func NewRoomController(uc usecase.RoomUseCase, rg *gin.RouterGroup, authmiddleware middleware.AuthMiddleware) *RoomController {
+	return &RoomController{uc: uc, rg: rg, authMiddleware: authmiddleware}
 }

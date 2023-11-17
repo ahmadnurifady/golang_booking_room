@@ -5,6 +5,7 @@ import (
 	// "final-project/delivery/middleware"
 	"final-project-booking-room/config"
 	"final-project-booking-room/delivery/controller"
+	"final-project-booking-room/delivery/middleware"
 	"final-project-booking-room/manager"
 	"final-project-booking-room/usecase"
 	"final-project-booking-room/utils/common"
@@ -23,12 +24,12 @@ type Server struct {
 }
 
 func (s *Server) setupControllers() {
-	// authMiddlerware := middleware.NewAuthMiddleware(s.jwtService)
+	authMiddlerware := middleware.NewAuthMiddleware(s.jwtService)
 	rg := s.engine.Group("/final/v1")
-	controller.NewRoomController(s.uc.RoomUsecase(), rg).Route()
+	controller.NewRoomController(s.uc.RoomUsecase(), rg, authMiddlerware).Route()
 	controller.NewUserController(s.uc.UserUseCase(), rg).Route()
-	controller.NewRoomController(s.uc.RoomUsecase(), rg).Route()
-	controller.NewBookingController(s.uc.BookingUsecase(), rg).Route()
+	controller.NewBookingController(s.uc.BookingUsecase(), rg, authMiddlerware).Route()
+	controller.NewAuthController(s.auth, rg, s.jwtService).Route()
 }
 
 func (s *Server) Run() {
@@ -48,13 +49,18 @@ func NewServer() *Server {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	repo := manager.NewRepoManager(infra)
 	uc := manager.NewUseCaseManager(repo)
 	engine := gin.Default()
 	host := fmt.Sprintf(":%s", cfg.ApiPort)
+	jwtService := common.NewJwtToken(cfg.TokenConfig)
 	return &Server{
 		uc:     uc,
 		engine: engine,
 		host:   host,
+		auth: usecase.NewAuthUseCase(uc.UserUseCase(),
+			jwtService),
+		jwtService: jwtService,
 	}
 }

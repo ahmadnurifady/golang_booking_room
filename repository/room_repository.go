@@ -137,7 +137,7 @@ func (r *roomRepository) Update(id string, payload model.Room) (model.Room, erro
 		&room.UpdatedAt,
 	)
 	if err != nil {
-		return model.Room{}, err
+		panic(err)
 	}
 
 	facilitie.Id = room.Facility.Id
@@ -160,6 +160,9 @@ func (r *roomRepository) Update(id string, payload model.Room) (model.Room, erro
 		&facilitie.CreatedAt,
 		&facilitie.UpdatedAt,
 	)
+	if err != nil {
+		panic(err)
+	}
 
 	room.Facility = facilitie
 

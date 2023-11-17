@@ -69,7 +69,7 @@ func (r *roomUseCase) UpdateById(id string, payload model.Room) (model.Room, err
 func (r *roomUseCase) DeleteById(id string) (model.Room, error) {
 	_, err := r.repo.Delete(id)
 	if err != nil {
-		return model.Room{}, err
+		return model.Room{}, fmt.Errorf("room with id %s not found", id)
 	}
 
 	return model.Room{}, err

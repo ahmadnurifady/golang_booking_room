@@ -10,4 +10,5 @@ const (
 				RETURNING id,name,divisi,jabatan,email,role,updatedat`
 	DeleteUser = `DELETE FROM users WHERE id = $1`
 	GetAllUser = `SELECT id,name,divisi,jabatan,email,role,createdat,updatedat FROM users`
+	GetByEmail = `SELECT id, name, divisi, jabatan, email, password, role FROM users WHERE email = $1`
 )

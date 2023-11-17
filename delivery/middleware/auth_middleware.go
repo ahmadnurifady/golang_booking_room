@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"final-project/config"
-	"final-project/utils/common"
+	"final-project-booking-room/config"
+	"final-project-booking-room/utils/common"
 	"net/http"
 	"strings"
 
