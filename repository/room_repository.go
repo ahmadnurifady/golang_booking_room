@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"final-project-booking-room/model"
+	"fmt"
 	"time"
 )
 
@@ -29,7 +30,10 @@ func (r *roomRepository) GetAllRoomByStatus(status string) ([]model.Room, error)
 
 	rows, err := r.db.Query(`SELECT r.id, r.roomtype, r.capacity, f.id, f.roomdescription, f.fwifi, f.fsoundsystem, f.fprojector, f.fscreenprojector, f.fchairs, f.ftables, f.fsoundproof, f.fsmonkingarea, f.ftelevison, f.fac, f.fbathroom, f.fcoffemaker, f.createdat, f.updatedat, r.status, r.createdat, r.updatedat FROM rooms AS r JOIN facilities AS f ON f.id = r.facilities WHERE r.status = $1`, status)
 	if err != nil {
-		return nil, err
+		return []model.Room{}, err
+	}
+	if status != "available" {
+		return []model.Room{}, fmt.Errorf("room with status %s not found", status)
 	}
 	defer rows.Close()
 
@@ -60,12 +64,12 @@ func (r *roomRepository) GetAllRoomByStatus(status string) ([]model.Room, error)
 			&room.UpdatedAt,
 		)
 		if err != nil {
-			return nil, err
+			return []model.Room{}, err
 		}
 		rooms = append(rooms, room)
 	}
 	if err != nil {
-		return nil, err
+		return []model.Room{}, err
 	}
 
 	return rooms, err

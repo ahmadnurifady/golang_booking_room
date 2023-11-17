@@ -76,8 +76,6 @@ func (r *RoomController) getHandler(ctx *gin.Context) {
 
 func (r *RoomController) getByRoomtypeHandler(ctx *gin.Context) {
 	roomType := ctx.Query("roomtype")
-	// var rspPayload model.Room
-	// var err error
 
 	if roomType == "" {
 		getAll, err := r.uc.ViewAllRooms()

@@ -25,7 +25,11 @@ type roomUseCase struct {
 
 func (r *roomUseCase) GetAllRoomByStatus(status string) ([]model.Room, error) {
 	room, err := r.repo.GetAllRoomByStatus(status)
+
 	if err != nil {
+		return nil, fmt.Errorf("room with status %s not found", status)
+	}
+	if status != "available" {
 		return nil, fmt.Errorf("room with status %s not found", status)
 	}
 
