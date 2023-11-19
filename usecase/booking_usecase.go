@@ -31,14 +31,16 @@ func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (mo
 	if err != nil {
 		return model.Booking{}, err
 	}
+
 	if status != "pending" {
 		return model.Booking{}, fmt.Errorf("Booking status with ID %s is already changed (not pending)", id)
 	}
 
 	statusRoom, err := b.roomUC.GetRoomStatusByBdId(id)
 	if err != nil {
-		return model.Booking{}, err
+		return model.Booking{}, fmt.Errorf(`Sorry, ID Booking detail %s is not found`, id)
 	}
+
 	if statusRoom == "booked" {
 		return model.Booking{}, fmt.Errorf("Sorry, room is already booked")
 	}

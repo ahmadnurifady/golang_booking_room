@@ -25,7 +25,7 @@ func (b *bookingRepository) GetBookStatus(id string) (string, error) {
 	var status string
 	err := b.db.QueryRow("SELECT status FROM booking_details WHERE id = $1", id).Scan(&status)
 	if err != nil {
-		return "Can't get booking detail status", err
+		return "", fmt.Errorf("ID booking details %s is not found", id)
 	}
 	return status, nil
 }
