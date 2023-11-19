@@ -30,7 +30,7 @@ func (u *userUseCase) FindByEmailPassword(email string, password string) (model.
 	}
 
 	if err := common.ComparePasswordHash(user.Password, password); err != nil {
-		return model.User{}, err
+		return model.User{}, fmt.Errorf("compare password %s ", err)
 	}
 
 	user.Password = ""
@@ -49,7 +49,7 @@ func (u *userUseCase) UpdateUserById(id string, payload model.User) (model.User,
 
 	updateUser, err = u.repo.UpdateUserById(user.Id, updateUser)
 	if err != nil {
-		return model.User{}, err
+		return model.User{}, fmt.Errorf("failed to update : %s", err)
 	}
 
 	return updateUser, nil
@@ -59,7 +59,7 @@ func (u *userUseCase) UpdateUserById(id string, payload model.User) (model.User,
 func (u *userUseCase) ViewAllUser() ([]model.User, error) {
 	user, err := u.repo.GetAllUser()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get all user : %s", err)
 	}
 	return user, nil
 }
@@ -81,6 +81,9 @@ func (u *userUseCase) DeleteUser(id string) (model.User, error) {
 }
 
 func (u *userUseCase) RegisterNewUser(payload model.User) (model.User, error) {
+	if !payload.IsEmpty() {
+		return model.User{}, errors.New("all fields must be filled in")
+	}
 	if !payload.IsValidRole() {
 		return model.User{}, errors.New("invalid role, role must admin or employee")
 	}

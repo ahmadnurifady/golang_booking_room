@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"final-project-booking-room/model"
 	"final-project-booking-room/utils/common"
 	"time"
@@ -33,7 +34,7 @@ func (u *userRepository) GetByEmail(email string) (model.User, error) {
 		&user.Role,
 	)
 	if err != nil {
-		return model.User{}, err
+		return model.User{}, errors.New("email not found")
 	}
 
 	return user, err
@@ -46,7 +47,7 @@ func (u *userRepository) GetById(id string) (model.User, error) {
 		Scan(&user.Id, &user.Name, &user.Divisi, &user.Jabatan, &user.Email, &user.Role, &user.CreatedAt, &user.UpdatedAt)
 
 	if err != nil {
-		return model.User{}, err
+		return model.User{}, errors.New("id not found")
 	}
 
 	return user, nil
@@ -60,7 +61,7 @@ func (u *userRepository) Create(payload model.User) (model.User, error) {
 		Scan(&user.Id, &user.Name, &user.Divisi, &user.Jabatan, &user.Email, &user.Role, &user.CreatedAt, &user.UpdatedAt)
 
 	if err != nil {
-		return model.User{}, err
+		return model.User{}, errors.New("failed to create user")
 	}
 
 	return user, nil
@@ -74,7 +75,7 @@ func (u *userRepository) UpdateUserById(id string, payload model.User) (model.Us
 		Scan(&user.Id, &user.Name, &user.Divisi, &user.Jabatan, &user.Email, &user.Role, &user.UpdatedAt)
 
 	if err != nil {
-		return model.User{}, err
+		return model.User{}, errors.New("failed to update user")
 	}
 
 	return user, nil
@@ -84,7 +85,7 @@ func (u *userRepository) UpdateUserById(id string, payload model.User) (model.Us
 func (u *userRepository) DeleteUserById(id string) (model.User, error) {
 	_, err := u.db.Exec(common.DeleteUser, id)
 	if err != nil {
-		return model.User{}, err
+		return model.User{}, errors.New("failed to delete user")
 	}
 
 	return model.User{}, nil
@@ -96,7 +97,7 @@ func (u *userRepository) GetAllUser() ([]model.User, error) {
 
 	rows, err := u.db.Query(common.GetAllUser)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("failed to get all user")
 	}
 	defer rows.Close()
 
@@ -104,7 +105,7 @@ func (u *userRepository) GetAllUser() ([]model.User, error) {
 		var user model.User
 		err := rows.Scan(&user.Id, &user.Name, &user.Divisi, &user.Jabatan, &user.Email, &user.Role, &user.CreatedAt, &user.UpdatedAt)
 		if err != nil {
-			return nil, err
+			return nil, errors.New("one of the rows is missing")
 		}
 		users = append(users, user)
 	}
