@@ -49,7 +49,6 @@ func (b *bookingRepository) UpdateStatus(id string, approval string) (model.Book
 	// Memulai transaksi
 	tx, err := b.db.Begin()
 	if err != nil {
-
 		return model.Booking{}, err
 	}
 
@@ -67,7 +66,7 @@ func (b *bookingRepository) UpdateStatus(id string, approval string) (model.Book
 	if approval == "accept" {
 		status = "booked"
 	}
-	_, err = tx.Exec(`UPDATE rooms SET status = $1 WHERE id = $2`, status, roomId)
+	_, err = tx.Query(`UPDATE rooms SET status = $1 WHERE id = $2`, status, roomId)
 	if err != nil {
 		tx.Rollback()
 		return model.Booking{}, err
@@ -82,7 +81,7 @@ func (b *bookingRepository) UpdateStatus(id string, approval string) (model.Book
 		SELECT b.id, u.id, u.name, u.divisi, u.jabatan, u.email, u.role, u.createdat, u.updatedat, b.createdat, b.updatedat 
 		FROM booking b 
 		JOIN users u ON u.id = b.userid
-		WHERE b.id = $1`, id).Scan(
+		WHERE b.id = $1`, bookingId).Scan(
 		&booking.Id,
 		&booking.Users.Id,
 		&booking.Users.Name,
@@ -101,7 +100,7 @@ func (b *bookingRepository) UpdateStatus(id string, approval string) (model.Book
 	}
 
 	// Menggunakan getBookingDetailsByBookingID untuk mendapatkan data booking details
-	bookingDetails, err := b.GetBookingDetailsByBookingID(id)
+	bookingDetails, err := b.GetBookingDetailsByBookingID(bookingId)
 	if err != nil {
 		return model.Booking{}, err
 	}

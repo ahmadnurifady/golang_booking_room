@@ -143,11 +143,7 @@ func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto, userI
 
 	user, err := b.userUC.FindById(userId)
 	if err != nil {
-<<<<<<< HEAD
-		return model.Booking{}, fmt.Errorf("User with ID %s not found", userId)
-=======
-		return model.Booking{}, fmt.Errorf("user with id %s not found", payload.UserId)
->>>>>>> 03712f5aec1ed8721eb86d1322fc9609f3665a7f
+		return model.Booking{}, fmt.Errorf("user with ID %s not found", userId)
 	}
 
 	var bookingDetails []model.BookingDetail
