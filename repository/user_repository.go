@@ -13,10 +13,30 @@ type UserRepository interface {
 	UpdateUserById(id string, payload model.User) (model.User, error)
 	DeleteUserById(id string) (model.User, error)
 	GetAllUser() ([]model.User, error)
+	GetByEmail(email string) (model.User, error)
 }
 
 type userRepository struct {
 	db *sql.DB
+}
+
+// MENCARI USER BERDASARKAN EMAIL => UNTUK LOGIN
+func (u *userRepository) GetByEmail(email string) (model.User, error) {
+	var user model.User
+	err := u.db.QueryRow(common.GetByEmail, email).Scan(
+		&user.Id,
+		&user.Name,
+		&user.Divisi,
+		&user.Jabatan,
+		&user.Email,
+		&user.Password,
+		&user.Role,
+	)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	return user, err
 }
 
 // !MENCARI USER BERDASARKAN ID

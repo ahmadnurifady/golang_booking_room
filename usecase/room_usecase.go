@@ -10,22 +10,47 @@ type RoomUseCase interface {
 	RegisterNewRoom(payload model.Room) (model.Room, error)
 	FindById(id string) (model.Room, error)
 	FindByRoomType(roomType string) (model.Room, error)
-	DeleteById(id string) error
-	UpdateById(id string) error
+	ViewAllRooms() ([]model.Room, error)
+	DeleteById(id string) (model.Room, error)
+	UpdateById(id string, payload model.Room) (model.Room, error)
 	GetRoomStatus(id string) (string, error)
 	GetRoomStatusByBdId(id string) (string, error)
 	ChangeRoomStatus(id string) error
+	GetAllRoomByStatus(status string) ([]model.Room, error)
 }
 
 type roomUseCase struct {
 	repo repository.RoomRepository
 }
 
+func (r *roomUseCase) GetAllRoomByStatus(status string) ([]model.Room, error) {
+	room, err := r.repo.GetAllRoomByStatus(status)
+
+	if err != nil {
+		return nil, fmt.Errorf("room with status %s not found", status)
+	}
+	if status != "available" {
+		return nil, fmt.Errorf("room with status %s not found", status)
+	}
+
+	return room, err
+}
+
+// ViewAllRooms implements RoomUseCase.
+func (r *roomUseCase) ViewAllRooms() ([]model.Room, error) {
+	room, err := r.repo.GetAllRoom()
+	if err != nil {
+		return nil, err
+	}
+
+	return room, err
+}
+
 // ChangeRoomStatus implements RoomUseCase.
 func (r *roomUseCase) ChangeRoomStatus(id string) error {
 	err := r.repo.ChangeStatus(id)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("room with id %s not found", id)
 	}
 	return err
 }
@@ -58,22 +83,19 @@ func (r *roomUseCase) FindByRoomType(roomType string) (model.Room, error) {
 }
 
 // UpdateById implements RoomUseCase.
-func (r *roomUseCase) UpdateById(id string) error {
-	err := r.repo.Update(id)
-	if err != nil {
-		panic(err)
-	}
-	return err
+func (r *roomUseCase) UpdateById(id string, payload model.Room) (model.Room, error) {
+
+	return r.repo.Update(id, payload)
 }
 
 // DeleteById implements RoomUseCase.
-func (r *roomUseCase) DeleteById(id string) error {
-	err := r.repo.Delete(id)
+func (r *roomUseCase) DeleteById(id string) (model.Room, error) {
+	_, err := r.repo.Delete(id)
 	if err != nil {
-		panic(err)
+		return model.Room{}, fmt.Errorf("room with id %s not found", id)
 	}
 
-	return err
+	return model.Room{}, err
 }
 
 // FindById implements RoomUseCase.
