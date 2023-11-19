@@ -9,7 +9,7 @@ import (
 )
 
 type BookingRepository interface {
-	Create(payload model.Booking) (model.Booking, error)
+	Create(payload model.Booking, userId string) (model.Booking, error)
 	Get(id string, userId string, roleUser string) (model.Booking, error)
 	GetAll() ([]model.Booking, error)
 	GetAllByStatus(status string) ([]model.Booking, error)
@@ -264,14 +264,15 @@ func (b *bookingRepository) GetBookingDetailsByBookingID(bookingID string) ([]mo
 }
 
 // Create implements BookingRepository.
-func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error) {
+func (b *bookingRepository) Create(payload model.Booking, userId string) (model.Booking, error) {
 	tx, err := b.db.Begin()
+	fmt.Println(userId)
 	if err != nil {
 		return model.Booking{}, err
 	}
 
 	var booking model.Booking
-	err = tx.QueryRow(`INSERT INTO booking (userId, updatedAt) VALUES ($1,$2) RETURNING id,userId,createdAt, updatedAt`, payload.Users.Id, time.Now()).Scan(
+	err = tx.QueryRow(`INSERT INTO booking (userId, updatedAt) VALUES ($1,$2) RETURNING id,userId,createdAt, updatedAt`, userId, time.Now()).Scan(
 		&booking.Id,
 		&booking.Users.Id,
 		&booking.CreatedAt,
@@ -328,9 +329,8 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 func (b *bookingRepository) Get(id string, userId string, roleUser string) (model.Booking, error) {
 	var booking model.Booking
 	var isAdminRole string
-	fmt.Println(roleUser)
 	if roleUser == "admin" || roleUser == "GA" {
-		isAdminRole = "b.id = $1 OR b.userid =$2"
+		isAdminRole = "b.id = $1 OR b.id = $2" // Harus begini karena kalo OR b.userid nanti ambil datanya salah tidak sesuai
 	} else {
 		isAdminRole = "b.id = $1 AND b.userid =$2"
 	}

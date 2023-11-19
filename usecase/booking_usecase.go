@@ -11,7 +11,7 @@ import (
 )
 
 type BookingUseCase interface {
-	RegisterNewBooking(payload dto.BookingRequestDto) (model.Booking, error)
+	RegisterNewBooking(payload dto.BookingRequestDto, roleUser string) (model.Booking, error)
 	FindById(id string, userId string, roleUser string) (model.Booking, error)
 	ViewAllBooking() ([]model.Booking, error)
 	ViewAllBookingByStatus(status string) ([]model.Booking, error)
@@ -139,11 +139,11 @@ func (b *bookingUseCase) FindById(id string, userId string, roleUser string) (mo
 }
 
 // RegisterNewBooking implements BookingUseCase.
-func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto) (model.Booking, error) {
+func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto, userId string) (model.Booking, error) {
 
-	user, err := b.userUC.FindById(payload.UserId)
+	user, err := b.userUC.FindById(userId)
 	if err != nil {
-		return model.Booking{}, fmt.Errorf("User with ID %s not found", payload.UserId)
+		return model.Booking{}, fmt.Errorf("User with ID %s not found", userId)
 	}
 
 	var bookingDetails []model.BookingDetail
@@ -171,7 +171,7 @@ func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto) (mode
 		BookingDetails: bookingDetails,
 	}
 
-	booking, err := b.repo.Create(newBookingPayload)
+	booking, err := b.repo.Create(newBookingPayload, userId)
 	if err != nil {
 		return model.Booking{}, err
 	}
