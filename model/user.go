@@ -17,3 +17,8 @@ type User struct {
 func (u User) IsValidRole() bool {
 	return u.Role == "admin" || u.Role == "employee" || u.Role == "GA"
 }
+
+func (u User) IsEmpty() bool {
+	return u.Name == "" || u.Divisi == "" || u.Jabatan == "" || u.Email == "" ||
+		u.Password == ""
+}

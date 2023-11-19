@@ -78,7 +78,7 @@ func (b *bookingUseCase) DownloadReport() ([]model.Booking, error) {
 // UpdateStatusBookAndRoom implements BookingUseCase.
 func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (model.Booking, error) {
 	if approval != "accept" && approval != "decline" {
-		return model.Booking{}, fmt.Errorf(`Please give approval: "accept" or "decline", not %s`, approval)
+		return model.Booking{}, fmt.Errorf(`please give approval: "accept" or "decline", not %s`, approval)
 	}
 
 	status, err := b.repo.GetBookStatus(id)
@@ -87,7 +87,7 @@ func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (mo
 	}
 
 	if status != "pending" {
-		return model.Booking{}, fmt.Errorf("Booking status with ID %s is already changed (not pending)", id)
+		return model.Booking{}, fmt.Errorf("booking status with id %s is already changed (not pending)", id)
 	}
 
 	statusRoom, err := b.roomUC.GetRoomStatusByBdId(id)
@@ -96,11 +96,11 @@ func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (mo
 	}
 
 	if statusRoom == "booked" {
-		return model.Booking{}, fmt.Errorf("Sorry, room is already booked")
+		return model.Booking{}, fmt.Errorf("sorry, room is already booked")
 	}
 
 	if approval != "accept" && approval != "decline" {
-		return model.Booking{}, fmt.Errorf(`Please give approval: "accept" or "decline", not %s`, approval)
+		return model.Booking{}, fmt.Errorf(`please give approval: "accept" or "decline", not %s`, approval)
 	}
 
 	booking, err := b.repo.UpdateStatus(id, approval)
@@ -143,19 +143,23 @@ func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto, userI
 
 	user, err := b.userUC.FindById(userId)
 	if err != nil {
+<<<<<<< HEAD
 		return model.Booking{}, fmt.Errorf("User with ID %s not found", userId)
+=======
+		return model.Booking{}, fmt.Errorf("user with id %s not found", payload.UserId)
+>>>>>>> 03712f5aec1ed8721eb86d1322fc9609f3665a7f
 	}
 
 	var bookingDetails []model.BookingDetail
 	for _, v := range payload.BoookingDetails {
 		room, err := b.roomUC.FindById(v.Rooms.Id)
 		if err != nil {
-			return model.Booking{}, fmt.Errorf("Room with ID %s is not found", v.Rooms.Id)
+			return model.Booking{}, fmt.Errorf("room with id %s is not found", v.Rooms.Id)
 		}
 
-		status, err := b.roomUC.GetRoomStatus(v.Rooms.Id)
+		status, _ := b.roomUC.GetRoomStatus(v.Rooms.Id)
 		if status != "available" {
-			return model.Booking{}, fmt.Errorf("Room status with ID %s is not available", v.Rooms.Id)
+			return model.Booking{}, fmt.Errorf("room status with id %s is not available", v.Rooms.Id)
 		}
 
 		bookingDetails = append(bookingDetails, model.BookingDetail{
