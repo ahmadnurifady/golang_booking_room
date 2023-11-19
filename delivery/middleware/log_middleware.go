@@ -3,10 +3,10 @@ package middleware
 import (
 	"final-project-booking-room/utils/common"
 	"final-project-booking-room/utils/modelutil"
+	"log"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 type LogMiddleware interface {
@@ -21,7 +21,7 @@ func (l *logMiddleware) LogRequest() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		err := l.logService.InitializeLogger()
 		if err != nil {
-			logrus.Error("err:", err.Error())
+			log.Fatal("err:", err.Error())
 		}
 		t := time.Now()
 

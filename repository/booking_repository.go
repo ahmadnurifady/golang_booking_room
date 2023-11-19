@@ -9,8 +9,8 @@ import (
 )
 
 type BookingRepository interface {
-	Create(payload model.Booking) (model.Booking, error)
-	Get(id string) (model.Booking, error)
+	Create(payload model.Booking, userId string) (model.Booking, error)
+	Get(id string, userId string, roleUser string) (model.Booking, error)
 	GetAll() ([]model.Booking, error)
 	GetAllByStatus(status string) ([]model.Booking, error)
 	UpdateStatus(id string, approval string) (model.Booking, error)
@@ -28,7 +28,7 @@ func (b *bookingRepository) GetBookStatus(id string) (string, error) {
 	var status string
 	err := b.db.QueryRow("SELECT status FROM booking_details WHERE id = $1", id).Scan(&status)
 	if err != nil {
-		return "Can't get booking detail status", err
+		return "", fmt.Errorf("ID booking details %s is not found", id)
 	}
 	return status, nil
 }
@@ -49,7 +49,6 @@ func (b *bookingRepository) UpdateStatus(id string, approval string) (model.Book
 	// Memulai transaksi
 	tx, err := b.db.Begin()
 	if err != nil {
-
 		return model.Booking{}, err
 	}
 
@@ -67,7 +66,7 @@ func (b *bookingRepository) UpdateStatus(id string, approval string) (model.Book
 	if approval == "accept" {
 		status = "booked"
 	}
-	_, err = tx.Exec(`UPDATE rooms SET status = $1 WHERE id = $2`, status, roomId)
+	_, err = tx.Query(`UPDATE rooms SET status = $1 WHERE id = $2`, status, roomId)
 	if err != nil {
 		tx.Rollback()
 		return model.Booking{}, err
@@ -78,10 +77,36 @@ func (b *bookingRepository) UpdateStatus(id string, approval string) (model.Book
 		return model.Booking{}, err
 	}
 
-	booking, err = b.Get(bookingId)
+	err = b.db.QueryRow(`
+		SELECT b.id, u.id, u.name, u.divisi, u.jabatan, u.email, u.role, u.createdat, u.updatedat, b.createdat, b.updatedat 
+		FROM booking b 
+		JOIN users u ON u.id = b.userid
+		WHERE b.id = $1`, bookingId).Scan(
+		&booking.Id,
+		&booking.Users.Id,
+		&booking.Users.Name,
+		&booking.Users.Divisi,
+		&booking.Users.Jabatan,
+		&booking.Users.Email,
+		&booking.Users.Role,
+		&booking.Users.CreatedAt,
+		&booking.Users.UpdatedAt,
+		&booking.CreatedAt,
+		&booking.UpdatedAt,
+	)
+
 	if err != nil {
 		return model.Booking{}, err
 	}
+
+	// Menggunakan getBookingDetailsByBookingID untuk mendapatkan data booking details
+	bookingDetails, err := b.GetBookingDetailsByBookingID(bookingId)
+	if err != nil {
+		return model.Booking{}, err
+	}
+
+	booking.BookingDetails = bookingDetails
+
 	return booking, nil
 }
 
@@ -238,14 +263,15 @@ func (b *bookingRepository) GetBookingDetailsByBookingID(bookingID string) ([]mo
 }
 
 // Create implements BookingRepository.
-func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error) {
+func (b *bookingRepository) Create(payload model.Booking, userId string) (model.Booking, error) {
 	tx, err := b.db.Begin()
+	fmt.Println(userId)
 	if err != nil {
 		return model.Booking{}, err
 	}
 
 	var booking model.Booking
-	err = tx.QueryRow(`INSERT INTO booking (userId, updatedAt) VALUES ($1,$2) RETURNING id,userId,createdAt, updatedAt`, payload.Users.Id, time.Now()).Scan(
+	err = tx.QueryRow(`INSERT INTO booking (userId, updatedAt) VALUES ($1,$2) RETURNING id,userId,createdAt, updatedAt`, userId, time.Now()).Scan(
 		&booking.Id,
 		&booking.Users.Id,
 		&booking.CreatedAt,
@@ -262,13 +288,13 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 
 		// convert booking date end, 3 hari setelah start
 		now := time.Now()
-		threeDays := 3 * 24 * time.Hour
-		threeDaysLater := now.Add(threeDays)
+		threeHours := 3 * time.Hour
+		threeHoursLater := now.Add(threeHours)
 
 		// status awal booking : pending
 		bdStatus := "pending"
 
-		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.Rooms.Id, time.Now(), threeDaysLater, bdStatus, v.Description, time.Now()).Scan(
+		err = tx.QueryRow(`INSERT INTO booking_details (bookingid, roomid, bookingdate, bookingdateend, status, description, updatedat) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, bookingid, roomid, bookingdate, bookingdateend, status, description, createdat, updatedat`, booking.Id, v.Rooms.Id, time.Now(), threeHoursLater, bdStatus, v.Description, time.Now()).Scan(
 			&bookingDetail.Id,
 			&bookingDetail.BookingId,
 			&bookingDetail.Rooms.Id,
@@ -299,14 +325,19 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 }
 
 // Get implements BookingRepository.
-func (b *bookingRepository) Get(id string) (model.Booking, error) {
+func (b *bookingRepository) Get(id string, userId string, roleUser string) (model.Booking, error) {
 	var booking model.Booking
-
+	var isAdminRole string
+	if roleUser == "admin" || roleUser == "GA" {
+		isAdminRole = "b.id = $1 OR b.id = $2" // Harus begini karena kalo OR b.userid nanti ambil datanya salah tidak sesuai
+	} else {
+		isAdminRole = "b.id = $1 AND b.userid =$2"
+	}
 	err := b.db.QueryRow(`
 		SELECT b.id, u.id, u.name, u.divisi, u.jabatan, u.email, u.role, u.createdat, u.updatedat, b.createdat, b.updatedat 
 		FROM booking b 
 		JOIN users u ON u.id = b.userid
-		WHERE b.id = $1`, id).Scan(
+		WHERE `+isAdminRole, id, userId).Scan(
 		&booking.Id,
 		&booking.Users.Id,
 		&booking.Users.Name,

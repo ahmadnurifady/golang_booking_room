@@ -3,6 +3,7 @@ package config
 const (
 	//auth
 	UserSesion = "user"
+	RoleSesion = "roleUser"
 
 	DownloadReport = "/download"
 	UserAdmin      = "08f0cea4-2d3e-40e6-b2ee-18c7ec5507d8"
