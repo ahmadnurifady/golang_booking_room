@@ -71,6 +71,10 @@ func (c *Config) readConfig() error {
 		Driver:   os.Getenv("DB_DRIVER"),
 	}
 
+	c.LogFileConfig = LogFileConfig{
+		FilePath: os.Getenv("LOG_FILE"),
+	}
+
 	tokenLifeTime, err := strconv.Atoi(os.Getenv("TOKEN_LIFE_TIME"))
 	if err != nil {
 		return err
@@ -82,12 +86,6 @@ func (c *Config) readConfig() error {
 		JwtLifeTime:     time.Duration(tokenLifeTime) * time.Hour,
 	}
 
-	if c.ApiPort == "" || c.Host == "" || c.DbConfig.Port == "" || c.Name == "" || c.User == "" || c.IssuerName == "" || c.JwtSignatureKey == nil || c.JwtLifeTime == 0 {
-		c.LogFileConfig = LogFileConfig{
-			FilePath: os.Getenv("LOG_FILE"),
-		}
-
-	}
 	if c.ApiPort == "" || c.DbConfig.Host == "" || c.DbConfig.Port == "" || c.DbConfig.Name == "" || c.DbConfig.User == "" ||
 		c.DbConfig.Password == "" || c.Driver == "" || c.EmailConfig.Server == "" || c.EmailConfig.Port == "" || c.EmailConfig.EmailFrom == "" ||
 		c.EmailConfig.Password == "" {

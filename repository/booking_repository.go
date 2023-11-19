@@ -10,7 +10,7 @@ import (
 
 type BookingRepository interface {
 	Create(payload model.Booking) (model.Booking, error)
-	Get(id string) (model.Booking, error)
+	Get(id string, userId string, roleUser string) (model.Booking, error)
 	GetAll() ([]model.Booking, error)
 	GetAllByStatus(status string) ([]model.Booking, error)
 	UpdateStatus(id string, approval string) (model.Booking, error)
@@ -78,10 +78,36 @@ func (b *bookingRepository) UpdateStatus(id string, approval string) (model.Book
 		return model.Booking{}, err
 	}
 
-	booking, err = b.Get(bookingId)
+	err = b.db.QueryRow(`
+		SELECT b.id, u.id, u.name, u.divisi, u.jabatan, u.email, u.role, u.createdat, u.updatedat, b.createdat, b.updatedat 
+		FROM booking b 
+		JOIN users u ON u.id = b.userid
+		WHERE b.id = $1`, id).Scan(
+		&booking.Id,
+		&booking.Users.Id,
+		&booking.Users.Name,
+		&booking.Users.Divisi,
+		&booking.Users.Jabatan,
+		&booking.Users.Email,
+		&booking.Users.Role,
+		&booking.Users.CreatedAt,
+		&booking.Users.UpdatedAt,
+		&booking.CreatedAt,
+		&booking.UpdatedAt,
+	)
+
 	if err != nil {
 		return model.Booking{}, err
 	}
+
+	// Menggunakan getBookingDetailsByBookingID untuk mendapatkan data booking details
+	bookingDetails, err := b.GetBookingDetailsByBookingID(id)
+	if err != nil {
+		return model.Booking{}, err
+	}
+
+	booking.BookingDetails = bookingDetails
+
 	return booking, nil
 }
 
@@ -299,14 +325,20 @@ func (b *bookingRepository) Create(payload model.Booking) (model.Booking, error)
 }
 
 // Get implements BookingRepository.
-func (b *bookingRepository) Get(id string) (model.Booking, error) {
+func (b *bookingRepository) Get(id string, userId string, roleUser string) (model.Booking, error) {
 	var booking model.Booking
-
+	var isAdminRole string
+	fmt.Println(roleUser)
+	if roleUser == "admin" || roleUser == "GA" {
+		isAdminRole = "b.id = $1 OR b.userid =$2"
+	} else {
+		isAdminRole = "b.id = $1 AND b.userid =$2"
+	}
 	err := b.db.QueryRow(`
 		SELECT b.id, u.id, u.name, u.divisi, u.jabatan, u.email, u.role, u.createdat, u.updatedat, b.createdat, b.updatedat 
 		FROM booking b 
 		JOIN users u ON u.id = b.userid
-		WHERE b.id = $1`, id).Scan(
+		WHERE `+isAdminRole, id, userId).Scan(
 		&booking.Id,
 		&booking.Users.Id,
 		&booking.Users.Name,

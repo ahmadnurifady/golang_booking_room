@@ -12,7 +12,7 @@ import (
 
 type BookingUseCase interface {
 	RegisterNewBooking(payload dto.BookingRequestDto) (model.Booking, error)
-	FindById(id string) (model.Booking, error)
+	FindById(id string, userId string, roleUser string) (model.Booking, error)
 	ViewAllBooking() ([]model.Booking, error)
 	ViewAllBookingByStatus(status string) ([]model.Booking, error)
 	UpdateStatusBookAndRoom(id string, approval string) (model.Booking, error)
@@ -130,8 +130,8 @@ func (b *bookingUseCase) ViewAllBooking() ([]model.Booking, error) {
 }
 
 // FindById implements BookingUseCase.
-func (b *bookingUseCase) FindById(id string) (model.Booking, error) {
-	booking, err := b.repo.Get(id)
+func (b *bookingUseCase) FindById(id string, userId string, roleUser string) (model.Booking, error) {
+	booking, err := b.repo.Get(id, userId, roleUser)
 	if err != nil {
 		return model.Booking{}, fmt.Errorf("booking with id %s not found", id)
 	}
