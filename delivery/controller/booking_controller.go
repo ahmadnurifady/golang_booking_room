@@ -23,8 +23,8 @@ func (b *BookingController) createHandler(ctx *gin.Context) {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
-
-	rspPayload, err := b.uc.RegisterNewBooking(payload)
+	userId := ctx.MustGet(config.UserSesion).(string)
+	rspPayload, err := b.uc.RegisterNewBooking(payload, userId)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
@@ -56,7 +56,9 @@ func (b *BookingController) getHandler(ctx *gin.Context) {
 		return
 	}
 
-	rspPayload, err := b.uc.FindById(id)
+	userId := ctx.MustGet(config.UserSesion).(string)
+	roleUser := ctx.MustGet(config.RoleSesion).(string)
+	rspPayload, err := b.uc.FindById(id, userId, roleUser)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusNotFound, err.Error())
 		return
@@ -90,13 +92,25 @@ func (b *BookingController) getAllHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "Ok", rspPayload)
 }
 
+func (b *BookingController) getReportHandler(ctx *gin.Context) {
+	rspPayload, err := b.uc.DownloadReport()
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(ctx, "Ok", rspPayload)
+}
+
 func (b *BookingController) Route() {
-	bc := b.rg.Group(config.BookingGroup, b.authMiddleware.RequireToken("admin", "GA", "employee"))
-	bc.POST(config.BookingPost, b.createHandler)
-	bc.PUT(config.Approval, b.UpdateStatusHandler)
-	bc.GET(config.BookingGetAll, b.getAllHandler)
-	bc.GET(config.BookingGet, b.getHandler)
-	bc.GET(config.BookingGetAllByStatus, b.getByStatusHandler)
+	bc := b.rg.Group(config.BookingGroup)
+	bc.POST(config.BookingPost, b.authMiddleware.RequireToken("admin", "employee", "GA"), b.createHandler)
+	bc.PUT(config.Approval, b.authMiddleware.RequireToken("GA"), b.UpdateStatusHandler)
+	bc.GET(config.BookingGetAll, b.authMiddleware.RequireToken("admin", "GA"), b.getAllHandler)
+	bc.GET(config.BookingGet, b.authMiddleware.RequireToken("admin", "employee", "GA"), b.getHandler)
+	bc.GET(config.BookingGetAllByStatus, b.authMiddleware.RequireToken("admin", "GA"), b.getByStatusHandler)
+	bc.GET(config.DownloadReport, b.authMiddleware.RequireToken("admin", "GA"), b.getReportHandler)
+
 }
 
 func NewBookingController(

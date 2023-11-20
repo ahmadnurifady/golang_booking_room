@@ -5,6 +5,7 @@ import (
 	"final-project-booking-room/model"
 	"final-project-booking-room/repository"
 	"final-project-booking-room/utils/common"
+	"final-project-booking-room/utils/modelutil"
 	"fmt"
 )
 
@@ -18,7 +19,8 @@ type UserUseCase interface {
 }
 
 type userUseCase struct {
-	repo repository.UserRepository
+	repo         repository.UserRepository
+	emailService common.EmailService
 }
 
 func (u *userUseCase) FindByEmailPassword(email string, password string) (model.User, error) {
@@ -28,7 +30,7 @@ func (u *userUseCase) FindByEmailPassword(email string, password string) (model.
 	}
 
 	if err := common.ComparePasswordHash(user.Password, password); err != nil {
-		return model.User{}, err
+		return model.User{}, fmt.Errorf("compare password %s ", err)
 	}
 
 	user.Password = ""
@@ -38,22 +40,26 @@ func (u *userUseCase) FindByEmailPassword(email string, password string) (model.
 
 // UpdateUserById implements UserUseCase.
 func (u *userUseCase) UpdateUserById(id string, payload model.User) (model.User, error) {
-	if !payload.IsValidRole() {
-		return model.User{}, errors.New("invalid role, role must admin or employee")
-	}
-	newPassword, err := common.GeneratePasswordHash(payload.Password)
+	user, err := u.repo.GetById(id)
 	if err != nil {
-		return model.User{}, err
+		return model.User{}, fmt.Errorf("user with ID %s not found", id)
 	}
-	payload.Password = newPassword
-	return u.repo.UpdateUserById(id, payload)
+
+	var updateUser model.User
+
+	updateUser, err = u.repo.UpdateUserById(user.Id, updateUser)
+	if err != nil {
+		return model.User{}, fmt.Errorf("failed to update : %s", err)
+	}
+
+	return updateUser, nil
 }
 
 // ViewAllUser implements UserUseCase.
 func (u *userUseCase) ViewAllUser() ([]model.User, error) {
 	user, err := u.repo.GetAllUser()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get all user : %s", err)
 	}
 	return user, nil
 }
@@ -75,6 +81,9 @@ func (u *userUseCase) DeleteUser(id string) (model.User, error) {
 }
 
 func (u *userUseCase) RegisterNewUser(payload model.User) (model.User, error) {
+	if !payload.IsEmpty() {
+		return model.User{}, errors.New("all fields must be filled in")
+	}
 	if !payload.IsValidRole() {
 		return model.User{}, errors.New("invalid role, role must admin or employee")
 	}
@@ -82,11 +91,24 @@ func (u *userUseCase) RegisterNewUser(payload model.User) (model.User, error) {
 	if err != nil {
 		return model.User{}, err
 	}
+
+	if payload.Email != "" && payload.Password != "" {
+		bodySender := modelutil.BodySender{
+			To:      []string{payload.Email},
+			Subject: "Registrasi Akun",
+			Body:    "Selamat ! Akun anda telah terdaftar. sekarang anda dapat melakukan Booking Room",
+		}
+		err := u.emailService.SendEmail(bodySender)
+		if err != nil {
+			return model.User{}, err
+		}
+	}
+
 	payload.Password = newPassword
 	return u.repo.Create(payload)
 
 }
 
-func NewUserUseCase(repo repository.UserRepository) UserUseCase {
-	return &userUseCase{repo: repo}
+func NewUserUseCase(repo repository.UserRepository, email common.EmailService) UserUseCase {
+	return &userUseCase{repo: repo, emailService: email}
 }

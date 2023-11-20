@@ -52,7 +52,6 @@ func (r *roomUseCase) ChangeRoomStatus(id string) error {
 	if err != nil {
 		return fmt.Errorf("room with id %s not found", id)
 	}
-
 	return err
 }
 
@@ -62,7 +61,7 @@ func (r *roomUseCase) GetRoomStatusByBdId(id string) (string, error) {
 	if err != nil {
 		return "Can't get room status from booking details ID", fmt.Errorf("room with booking details id %s not found", id)
 	}
-	return getStatus, err
+	return getStatus, nil
 }
 
 // GetRoomStatus implements RoomUseCase.
@@ -71,7 +70,7 @@ func (r *roomUseCase) GetRoomStatus(id string) (string, error) {
 	if err != nil {
 		return "Can't get room status", fmt.Errorf("room with id %s not found", id)
 	}
-	return getStatus, err
+	return getStatus, nil
 }
 
 // FindByRoomType implements RoomUseCase.
