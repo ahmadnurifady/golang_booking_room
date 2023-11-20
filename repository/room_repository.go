@@ -190,7 +190,7 @@ func (r *roomRepository) GetByRoomType(roomType string) (model.Room, error) {
 // Update implements RoomRepository.
 func (r *roomRepository) Update(id string, payload model.Room) (model.Room, error) {
 	var room model.Room
-	var facilitie model.RoomFacility
+	// var facilitie model.RoomFacility
 
 	err := r.db.QueryRow(`UPDATE rooms SET roomtype = $1, capacity = $2, status = $3, updatedat = $4 WHERE id = $5 RETURNING facilities, id, roomtype, capacity, status, createdat, updatedat`, payload.RoomType, payload.MaxCapacity, payload.Status, time.Now(), id).Scan(
 		&room.Facility.Id,
@@ -205,31 +205,29 @@ func (r *roomRepository) Update(id string, payload model.Room) (model.Room, erro
 		return model.Room{}, err
 	}
 
-	facilitie.Id = room.Facility.Id
+	// facilitie.Id = room.Facility.Id
 
-	err = r.db.QueryRow(`UPDATE facilities SET roomdescription = $1, fwifi = $2, fsoundsystem = $3, fprojector = $4, fscreenprojector = $5, fchairs = $6, ftables = $7, fsoundproof = $8, fsmonkingarea = $9, ftelevison = $10, fac = $11, fbathroom = $12, fcoffemaker = $13, updatedat = $14 WHERE id = $15 RETURNING id, roomdescription, fwifi, fsoundsystem, fprojector, fscreenprojector, fchairs, ftables, fsoundproof, fsmonkingarea, ftelevison, fac, fbathroom, fcoffemaker,createdat, updatedat`, payload.Facility.RoomDescription, payload.Facility.Fwifi, payload.Facility.FsoundSystem, payload.Facility.Fprojector, payload.Facility.FscreenProjector, payload.Facility.Fchairs, payload.Facility.Ftables, payload.Facility.FsoundProof, payload.Facility.FsmonkingArea, payload.Facility.Ftelevison, payload.Facility.FAc, payload.Facility.Fbathroom, payload.Facility.FcoffeMaker, time.Now(), payload.Facility.Id).Scan(
-		&facilitie.Id,
-		&facilitie.RoomDescription,
-		&facilitie.Fwifi,
-		&facilitie.FsoundSystem,
-		&facilitie.Fprojector,
-		&facilitie.FscreenProjector,
-		&facilitie.Fchairs,
-		&facilitie.Ftables,
-		&facilitie.FsoundProof,
-		&facilitie.FsmonkingArea,
-		&facilitie.Ftelevison,
-		&facilitie.FAc,
-		&facilitie.Fbathroom,
-		&facilitie.FcoffeMaker,
-		&facilitie.CreatedAt,
-		&facilitie.UpdatedAt,
+	err = r.db.QueryRow(`UPDATE facilities SET roomdescription = $1, fwifi = $2, fsoundsystem = $3, fprojector = $4, fscreenprojector = $5, fchairs = $6, ftables = $7, fsoundproof = $8, fsmonkingarea = $9, ftelevison = $10, fac = $11, fbathroom = $12, fcoffemaker = $13, updatedat = $14 WHERE id = $15 RETURNING id, roomdescription, fwifi, fsoundsystem, fprojector, fscreenprojector, fchairs, ftables, fsoundproof, fsmonkingarea, ftelevison, fac, fbathroom, fcoffemaker,createdat, updatedat`, payload.Facility.RoomDescription, payload.Facility.Fwifi, payload.Facility.FsoundSystem, payload.Facility.Fprojector, payload.Facility.FscreenProjector, payload.Facility.Fchairs, payload.Facility.Ftables, payload.Facility.FsoundProof, payload.Facility.FsmonkingArea, payload.Facility.Ftelevison, payload.Facility.FAc, payload.Facility.Fbathroom, payload.Facility.FcoffeMaker, time.Now(), room.Facility.Id).Scan(
+		&room.Facility.Id,
+		&room.Facility.RoomDescription,
+		&room.Facility.Fwifi,
+		&room.Facility.FsoundSystem,
+		&room.Facility.Fprojector,
+		&room.Facility.FscreenProjector,
+		&room.Facility.Fchairs,
+		&room.Facility.Ftables,
+		&room.Facility.FsoundProof,
+		&room.Facility.FsmonkingArea,
+		&room.Facility.Ftelevison,
+		&room.Facility.FAc,
+		&room.Facility.Fbathroom,
+		&room.Facility.FcoffeMaker,
+		&room.Facility.CreatedAt,
+		&room.Facility.UpdatedAt,
 	)
 	if err != nil {
 		return model.Room{}, err
 	}
-
-	room.Facility = facilitie
 
 	return room, err
 }
