@@ -11,8 +11,8 @@ import (
 )
 
 type BookingUseCase interface {
-	RegisterNewBooking(payload dto.BookingRequestDto) (model.Booking, error)
-	FindById(id string) (model.Booking, error)
+	RegisterNewBooking(payload dto.BookingRequestDto, roleUser string) (model.Booking, error)
+	FindById(id string, userId string, roleUser string) (model.Booking, error)
 	ViewAllBooking() ([]model.Booking, error)
 	ViewAllBookingByStatus(status string) ([]model.Booking, error)
 	UpdateStatusBookAndRoom(id string, approval string) (model.Booking, error)
@@ -85,14 +85,16 @@ func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (mo
 	if err != nil {
 		return model.Booking{}, err
 	}
+
 	if status != "pending" {
 		return model.Booking{}, fmt.Errorf("booking status with id %s is already changed (not pending)", id)
 	}
 
 	statusRoom, err := b.roomUC.GetRoomStatusByBdId(id)
 	if err != nil {
-		return model.Booking{}, err
+		return model.Booking{}, fmt.Errorf(`Sorry, ID Booking detail %s is not found`, id)
 	}
+
 	if statusRoom == "booked" {
 		return model.Booking{}, fmt.Errorf("sorry, room is already booked")
 	}
@@ -128,8 +130,8 @@ func (b *bookingUseCase) ViewAllBooking() ([]model.Booking, error) {
 }
 
 // FindById implements BookingUseCase.
-func (b *bookingUseCase) FindById(id string) (model.Booking, error) {
-	booking, err := b.repo.Get(id)
+func (b *bookingUseCase) FindById(id string, userId string, roleUser string) (model.Booking, error) {
+	booking, err := b.repo.Get(id, userId, roleUser)
 	if err != nil {
 		return model.Booking{}, fmt.Errorf("booking with id %s not found", id)
 	}
@@ -137,11 +139,11 @@ func (b *bookingUseCase) FindById(id string) (model.Booking, error) {
 }
 
 // RegisterNewBooking implements BookingUseCase.
-func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto) (model.Booking, error) {
+func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto, userId string) (model.Booking, error) {
 
-	user, err := b.userUC.FindById(payload.UserId)
+	user, err := b.userUC.FindById(userId)
 	if err != nil {
-		return model.Booking{}, fmt.Errorf("user with id %s not found", payload.UserId)
+		return model.Booking{}, fmt.Errorf("user with ID %s not found", userId)
 	}
 
 	var bookingDetails []model.BookingDetail
@@ -169,7 +171,7 @@ func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto) (mode
 		BookingDetails: bookingDetails,
 	}
 
-	booking, err := b.repo.Create(newBookingPayload)
+	booking, err := b.repo.Create(newBookingPayload, userId)
 	if err != nil {
 		return model.Booking{}, err
 	}

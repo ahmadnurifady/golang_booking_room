@@ -42,6 +42,8 @@ func (a *authMiddleware) RequireToken(roles ...string) gin.HandlerFunc {
 		}
 
 		ctx.Set(config.UserSesion, claims["userId"])
+		ctx.Set(config.RoleSesion, claims["role"])
+		// fmt.Println("claims :", claims)
 
 		var validRole bool
 		for _, role := range roles {
