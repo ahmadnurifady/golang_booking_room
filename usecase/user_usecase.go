@@ -40,19 +40,14 @@ func (u *userUseCase) FindByEmailPassword(email string, password string) (model.
 
 // UpdateUserById implements UserUseCase.
 func (u *userUseCase) UpdateUserById(id string, payload model.User) (model.User, error) {
-	user, err := u.repo.GetById(id)
+	newPassword, err := common.GeneratePasswordHash(payload.Password)
 	if err != nil {
-		return model.User{}, fmt.Errorf("user with ID %s not found", id)
+		return model.User{}, err
 	}
 
-	var updateUser model.User
+	payload.Password = newPassword
 
-	updateUser, err = u.repo.UpdateUserById(user.Id, updateUser)
-	if err != nil {
-		return model.User{}, fmt.Errorf("failed to update : %s", err)
-	}
-
-	return updateUser, nil
+	return u.repo.UpdateUserById(id, payload)
 }
 
 // ViewAllUser implements UserUseCase.
@@ -81,12 +76,14 @@ func (u *userUseCase) DeleteUser(id string) (model.User, error) {
 }
 
 func (u *userUseCase) RegisterNewUser(payload model.User) (model.User, error) {
-	if !payload.IsEmpty() {
+	if !payload.IsValidRole() {
+		return model.User{}, errors.New("invalid role, role must be admin or employee")
+	}
+
+	if payload.IsEmpty() {
 		return model.User{}, errors.New("all fields must be filled in")
 	}
-	if !payload.IsValidRole() {
-		return model.User{}, errors.New("invalid role, role must admin or employee")
-	}
+
 	newPassword, err := common.GeneratePasswordHash(payload.Password)
 	if err != nil {
 		return model.User{}, err

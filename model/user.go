@@ -19,6 +19,5 @@ func (u User) IsValidRole() bool {
 }
 
 func (u User) IsEmpty() bool {
-	return u.Name == "" || u.Divisi == "" || u.Jabatan == "" || u.Email == "" ||
-		u.Password == ""
+	return u.Name == "" || u.Divisi == "" || u.Jabatan == "" || u.Email == "" || u.Password == ""
 }
