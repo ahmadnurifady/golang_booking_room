@@ -92,7 +92,7 @@ func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (mo
 
 	statusRoom, err := b.roomUC.GetRoomStatusByBdId(id)
 	if err != nil {
-		return model.Booking{}, fmt.Errorf(`Sorry, ID Booking detail %s is not found`, id)
+		return model.Booking{}, fmt.Errorf("sorry, ID Booking detail %s is not found", id)
 	}
 
 	if statusRoom == "booked" {
@@ -115,7 +115,7 @@ func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (mo
 func (b *bookingUseCase) ViewAllBookingByStatus(status string) ([]model.Booking, error) {
 	bookings, err := b.repo.GetAllByStatus(status)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get data, err: %v", err)
+		return nil, fmt.Errorf("failed to get data error: %v", err)
 	}
 	return bookings, nil
 }

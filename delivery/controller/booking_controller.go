@@ -26,7 +26,7 @@ func (b *BookingController) createHandler(ctx *gin.Context) {
 	userId := ctx.MustGet(config.UserSesion).(string)
 	rspPayload, err := b.uc.RegisterNewBooking(payload, userId)
 	if err != nil {
-		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 

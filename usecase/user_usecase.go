@@ -81,11 +81,11 @@ func (u *userUseCase) DeleteUser(id string) (model.User, error) {
 }
 
 func (u *userUseCase) RegisterNewUser(payload model.User) (model.User, error) {
-	if !payload.IsEmpty() {
-		return model.User{}, errors.New("all fields must be filled in")
-	}
 	if !payload.IsValidRole() {
 		return model.User{}, errors.New("invalid role, role must admin or employee")
+	}
+	if !payload.IsEmpty() {
+		return model.User{}, errors.New("all fields must be filled in")
 	}
 	newPassword, err := common.GeneratePasswordHash(payload.Password)
 	if err != nil {
