@@ -151,7 +151,7 @@ func (b *bookingUseCase) RegisterNewBooking(payload dto.BookingRequestDto) (mode
 			return model.Booking{}, fmt.Errorf("room with id %s is not found", v.Rooms.Id)
 		}
 
-		status, err := b.roomUC.GetRoomStatus(v.Rooms.Id)
+		status, _ := b.roomUC.GetRoomStatus(v.Rooms.Id)
 		if status != "available" {
 			return model.Booking{}, fmt.Errorf("room status with id %s is not available", v.Rooms.Id)
 		}
