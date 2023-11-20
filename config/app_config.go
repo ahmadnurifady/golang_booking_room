@@ -18,7 +18,7 @@ const (
 	UserGet    = "/:id"
 	UserDelete = "/:id"
 	UserGetAll = "/"
-	UserUpdate = "/"
+	UserUpdate = "/:id"
 
 	//booking
 	BookingGroup          = "/booking"
