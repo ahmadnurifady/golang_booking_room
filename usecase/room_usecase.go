@@ -27,10 +27,10 @@ func (r *roomUseCase) GetAllRoomByStatus(status string) ([]model.Room, error) {
 	room, err := r.repo.GetAllRoomByStatus(status)
 
 	if err != nil {
-		return nil, fmt.Errorf("room with status %s not found", status)
+		return []model.Room{}, fmt.Errorf("room with status %s not found", status)
 	}
 	if status != "available" {
-		return nil, fmt.Errorf("room with status %s not found", status)
+		return []model.Room{}, fmt.Errorf("room with status %s not found", status)
 	}
 
 	return room, err
@@ -86,6 +86,11 @@ func (r *roomUseCase) FindByRoomType(roomType string) (model.Room, error) {
 // UpdateById implements RoomUseCase.
 func (r *roomUseCase) UpdateById(id string, payload model.Room) (model.Room, error) {
 
+	_, err := r.repo.Get(id)
+	if err != nil {
+		return model.Room{}, fmt.Errorf("room with id %s not found", id)
+	}
+
 	return r.repo.Update(id, payload)
 }
 
@@ -103,7 +108,7 @@ func (r *roomUseCase) DeleteById(id string) (model.Room, error) {
 func (r *roomUseCase) FindById(id string) (model.Room, error) {
 	findRoom, err := r.repo.Get(id)
 	if err != nil {
-		return model.Room{}, fmt.Errorf("room with roomType %s not found", id)
+		return model.Room{}, fmt.Errorf("room with ID %s not found", id)
 	}
 
 	return findRoom, err
