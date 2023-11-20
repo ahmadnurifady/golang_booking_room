@@ -1,6 +1,9 @@
 package manager
 
-import "final-project-booking-room/repository"
+import (
+	"final-project-booking-room/config"
+	"final-project-booking-room/repository"
+)
 
 type RepoManager interface {
 	UserRepo() repository.UserRepository
@@ -10,6 +13,7 @@ type RepoManager interface {
 
 type repoManager struct {
 	infra InfraManager
+	cfgt  config.TokenConfig
 }
 
 // BookingRepo implements RepoManager.
@@ -22,7 +26,7 @@ func (r *repoManager) RoomRepo() repository.RoomRepository {
 	return repository.NewRoomRepository(r.infra.Conn())
 }
 func (r *repoManager) UserRepo() repository.UserRepository {
-	return repository.NewUserRepository(r.infra.Conn())
+	return repository.NewUserRepository(r.infra.Conn(), r.cfgt)
 }
 
 func NewRepoManager(infra InfraManager) RepoManager {
