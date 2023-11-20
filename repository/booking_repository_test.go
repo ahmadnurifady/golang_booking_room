@@ -70,44 +70,6 @@ func (suite *BookingRepositoryTestSuite) TestGetBookStatus_Fail() {
 	assert.Error(suite.T(), err)
 }
 
-func (suite *BookingRepositoryTestSuite) TestUpdateStatus_Success() {
-	mockBooking := model.Booking{
-		Id: "1",
-		Users: model.User{
-			Id:   "1",
-			Name: "Siapa",
-			Role: "admin",
-		},
-		BookingDetails: []model.BookingDetail{
-			{
-				Id:        "1",
-				BookingId: "1",
-				Rooms: model.Room{
-					Id:       "1",
-					RoomType: "ruang_santai",
-					Status:   "available",
-				},
-				Status: "pending",
-			},
-		},
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-
-	suite.mockSql.ExpectBegin()
-
-	var roomId, status, bdid, approval string
-	rows := sqlmock.NewRows([]string{"bookingid", "roomid"}).AddRow(mockBooking.Id, roomId)
-	suite.mockSql.ExpectQuery("UPDATE booking_details").WithArgs(approval, bdid).WillReturnRows(rows)
-
-	suite.mockSql.ExpectExec("UPDATE rooms").WithArgs(status, roomId)
-
-	suite.mockSql.ExpectCommit()
-
-	rows2 := sqlmock.NewRows([]string{"b.id", "u.id", "u.name"}).AddRow(mockBooking.Id, mockBooking.Users.Id, mockBooking.Users.Name)
-	suite.mockSql.ExpectQuery("SELECT b.id, u.id").WillReturnRows(rows2)
-}
-
 func (suite *BookingRepositoryTestSuite) TestCreateBooking_Success() {
 	mockBooking := model.Booking{
 		Id: "1",
@@ -152,7 +114,6 @@ func (suite *BookingRepositoryTestSuite) TestCreateBooking_Success() {
 
 func (suite *BookingRepositoryTestSuite) TestGetBookingDetailsByBookingID_Success() {
 
-	// Mock data yang diharapkan dari database
 	expectedBookingDetails := model.BookingDetail{
 		Id:        "1",
 		BookingId: "",
@@ -226,7 +187,7 @@ func (suite *BookingRepositoryTestSuite) TestGetBookingDetailsByBookingID_Succes
 	results, err := suite.repo.GetBookingDetailsByBookingID("booking_id_value")
 
 	assert.NoError(suite.T(), suite.mockSql.ExpectationsWereMet())
-
+	assert.Nil(suite.T(), err)
 	assert.NoError(suite.T(), err)
 	assert.Len(suite.T(), results, 1)
 
@@ -256,7 +217,6 @@ func (suite *BookingRepositoryTestSuite) TestGet_Success() {
 		UpdatedAt: time.Now(),
 	}
 
-	// Konfigurasi mock query
 	suite.mockSql.ExpectQuery("^SELECT .*").WithArgs("booking_id_value", "userId").WillReturnRows(sqlmock.NewRows(
 		[]string{"id", "users.id", "users.name", "users.divisi", "users.jabatan", "users.email", "users.role", "users.createdat", "users.updatedat", "createdat", "updatedat"},
 	).AddRow(
@@ -307,13 +267,11 @@ func (suite *BookingRepositoryTestSuite) TestGet_Success() {
 			v.Rooms.Facility.CreatedAt,
 		))
 	}
-	// Panggil fungsi yang akan diuji
 	result, err := suite.repo.Get("booking_id_value", "userId", "admin")
 
-	// Verifikasi bahwa query dieksekusi sesuai yang diharapkan
 	assert.NoError(suite.T(), suite.mockSql.ExpectationsWereMet())
 
-	// Verifikasi hasil fungsi sesuai dengan yang diharapkan
+	assert.Nil(suite.T(), err)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), mockBooking.Id, result.Id)
 }
@@ -396,13 +354,10 @@ func (suite *BookingRepositoryTestSuite) TestGetAll_Success() {
 			))
 		}
 	}
-	// Panggil fungsi yang akan diuji
 	result, err := suite.repo.GetAll()
 
-	// Verifikasi bahwa query dieksekusi sesuai yang diharapkan
 	assert.NoError(suite.T(), suite.mockSql.ExpectationsWereMet())
 
-	// Verifikasi hasil fungsi sesuai dengan yang diharapkan
 	assert.NoError(suite.T(), err)
 
 	assert.Equal(suite.T(), mockBooking[0].Id, result[0].Id)
@@ -434,7 +389,6 @@ func (suite *BookingRepositoryTestSuite) TestGetAllByStatus_Success() {
 	}
 
 	for _, x := range mockBooking {
-		// Konfigurasi mock query
 		suite.mockSql.ExpectQuery("^SELECT .*").WithArgs("status").WillReturnRows(sqlmock.NewRows(
 			[]string{"id", "users.id", "users.name", "users.divisi", "users.jabatan", "users.email", "users.role", "users.createdat", "users.updatedat", "createdat", "updatedat"},
 		).AddRow(
@@ -486,13 +440,10 @@ func (suite *BookingRepositoryTestSuite) TestGetAllByStatus_Success() {
 			))
 		}
 	}
-	// Panggil fungsi yang akan diuji
 	result, err := suite.repo.GetAllByStatus("status")
 
-	// Verifikasi bahwa query dieksekusi sesuai yang diharapkan
 	assert.NoError(suite.T(), suite.mockSql.ExpectationsWereMet())
 
-	// Verifikasi hasil fungsi sesuai dengan yang diharapkan
 	assert.NoError(suite.T(), err)
 
 	assert.Equal(suite.T(), mockBooking[0].Id, result[0].Id)
