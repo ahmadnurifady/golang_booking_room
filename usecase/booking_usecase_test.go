@@ -15,6 +15,7 @@ type BookingUseCaseTestSuite struct {
 	brm *repositorymock.BookingRepoMock
 	uum *usecasemock.UserUseCaseMock
 	rum *usecasemock.RoomUseCaseMock
+	ues *usecasemock.EmailServiceMock
 	bu  BookingUseCase
 }
 
@@ -22,7 +23,8 @@ func (suite *BookingUseCaseTestSuite) SetupTest() {
 	suite.brm = new(repositorymock.BookingRepoMock)
 	suite.uum = new(usecasemock.UserUseCaseMock)
 	suite.rum = new(usecasemock.RoomUseCaseMock)
-	suite.bu = NewBookingUseCase(suite.brm, suite.uum, suite.rum)
+	suite.ues = new(usecasemock.EmailServiceMock)
+	suite.bu = NewBookingUseCase(suite.brm, suite.uum, suite.rum, suite.ues)
 }
 
 func TestBookingUseCaseTestSuite(t *testing.T) {

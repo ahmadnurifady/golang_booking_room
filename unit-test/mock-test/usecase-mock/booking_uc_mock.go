@@ -36,7 +36,7 @@ func (b *BillUseCaseMock) UpdateStatusBookAndRoom(id string, approval string) (m
 	return args.Get(0).(model.Booking), args.Error(1)
 }
 
-func (b *BillUseCaseMock) GetReport() ([]model.Booking, error) {
+func (b *BillUseCaseMock) DownloadReport() ([]model.Booking, error) {
 	args := b.Called()
 	return args.Get(0).([]model.Booking), args.Error(1)
 }

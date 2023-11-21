@@ -16,7 +16,7 @@ type BookingRepository interface {
 	UpdateStatus(id string, approval string) (model.Booking, error)
 	GetBookStatus(id string) (string, error)
 	GetBookingDetailsByBookingID(bookingID string) ([]model.BookingDetail, error)
-	GetReport() ([]model.Booking, error)
+	GetReport(requestJSON string) ([]model.Booking, error)
 }
 
 type bookingRepository struct {
@@ -33,7 +33,7 @@ func (b *bookingRepository) GetBookStatus(id string) (string, error) {
 	return status, nil
 }
 
-func (b *bookingRepository) GetReport() ([]model.Booking, error) {
+func (b *bookingRepository) GetReport(requestJSON string) ([]model.Booking, error) {
 	var result []model.Booking
 	_, err := b.db.Exec(common.DownloadReport, result)
 	if err != nil {

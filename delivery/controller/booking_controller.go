@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"final-project-booking-room/config"
 	"final-project-booking-room/delivery/middleware"
 	"final-project-booking-room/model/dto"
@@ -92,6 +93,33 @@ func (b *BookingController) getAllHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "Ok", rspPayload)
 }
 
+func (b *BookingController) sendReportHandler(ctx *gin.Context) {
+	var requestPayload map[string]string
+	if err := ctx.BindJSON(&requestPayload); err != nil {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "Invalid JSON payload")
+		return
+	}
+
+	toEmail, ok := requestPayload["to"]
+	if !ok || toEmail == "" {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "Invalid or missing 'to' field in JSON payload")
+		return
+	}
+
+	requestJSON, err := json.Marshal(map[string]string{"to": toEmail})
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusInternalServerError, "Error marshaling JSON")
+		return
+	}
+	rspPayload, err := b.uc.SendReport(string(requestJSON))
+	if err != nil {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(ctx, "Ok", rspPayload)
+}
+
 func (b *BookingController) getReportHandler(ctx *gin.Context) {
 	rspPayload, err := b.uc.DownloadReport()
 	if err != nil {
@@ -110,6 +138,7 @@ func (b *BookingController) Route() {
 	bc.GET(config.BookingGet, b.authMiddleware.RequireToken("admin", "employee", "GA"), b.getHandler)
 	bc.GET(config.BookingGetAllByStatus, b.authMiddleware.RequireToken("admin", "GA"), b.getByStatusHandler)
 	bc.GET(config.DownloadReport, b.authMiddleware.RequireToken("admin", "GA"), b.getReportHandler)
+	bc.GET(config.SendReport, b.authMiddleware.RequireToken("admin", "GA"), b.sendReportHandler)
 
 }
 

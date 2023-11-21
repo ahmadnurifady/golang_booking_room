@@ -2,10 +2,14 @@ package usecasemock
 
 import (
 	"final-project-booking-room/model"
+	"final-project-booking-room/utils/modelutil"
 
 	"github.com/stretchr/testify/mock"
 )
 
+type EmailServiceMock struct {
+	SendEmailFunc func(payload modelutil.BodySender) error
+}
 type UserUseCaseMock struct {
 	mock.Mock
 }
@@ -43,4 +47,18 @@ func (u *UserUseCaseMock) ViewAllUser() ([]model.User, error) {
 func (u *UserUseCaseMock) FindById(id string) (model.User, error) {
 	args := u.Called(id)
 	return args.Get(0).(model.User), args.Error(1)
+}
+
+func (m *EmailServiceMock) SendEmail(payload modelutil.BodySender) error {
+	if m.SendEmailFunc != nil {
+		return m.SendEmailFunc(payload)
+	}
+	return nil
+}
+
+func (m *EmailServiceMock) SendEmailFile(payload modelutil.BodySender) error {
+	if m.SendEmailFunc != nil {
+		return m.SendEmailFunc(payload)
+	}
+	return nil
 }
