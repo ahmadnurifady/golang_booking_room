@@ -11,7 +11,7 @@ import (
 )
 
 type BookingUseCase interface {
-	RegisterNewBooking(payload dto.BookingRequestDto, roleUser string) (model.Booking, error)
+	RegisterNewBooking(payload dto.BookingRequestDto, userId string) (model.Booking, error)
 	FindById(id string, userId string, roleUser string) (model.Booking, error)
 	ViewAllBooking() ([]model.Booking, error)
 	ViewAllBookingByStatus(status string) ([]model.Booking, error)

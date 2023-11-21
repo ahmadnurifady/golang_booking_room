@@ -42,7 +42,7 @@ func (b *BookingController) UpdateStatusHandler(ctx *gin.Context) {
 
 	rspPayload, err := b.uc.UpdateStatusBookAndRoom(payload.BookingDetailId, payload.Approval)
 	if err != nil {
-		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -75,7 +75,7 @@ func (b *BookingController) getByStatusHandler(ctx *gin.Context) {
 	}
 	rspPayload, err := b.uc.ViewAllBookingByStatus(status)
 	if err != nil {
-		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -85,7 +85,7 @@ func (b *BookingController) getByStatusHandler(ctx *gin.Context) {
 func (b *BookingController) getAllHandler(ctx *gin.Context) {
 	rspPayload, err := b.uc.ViewAllBooking()
 	if err != nil {
-		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -95,7 +95,7 @@ func (b *BookingController) getAllHandler(ctx *gin.Context) {
 func (b *BookingController) getReportHandler(ctx *gin.Context) {
 	rspPayload, err := b.uc.DownloadReport()
 	if err != nil {
-		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
