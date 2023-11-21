@@ -2,7 +2,8 @@ package usecase
 
 import (
 	"final-project-booking-room/model"
-	repositorymock "final-project-booking-room/unit-test/mock-test/repository-mock"
+	repositorymock "project-final/unit-test/mock-test/repository-mock"
+
 	"testing"
 	"time"
 

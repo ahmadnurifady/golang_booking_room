@@ -1,13 +1,12 @@
 package controller
 
 import (
-	"final-project-booking-room/config"
-	"final-project-booking-room/delivery/middleware"
-	"final-project-booking-room/model"
-	"final-project-booking-room/usecase"
-	"final-project-booking-room/utils/common"
-
 	"net/http"
+	"project-final/config"
+	"project-final/delivery/middleware"
+	"project-final/model"
+	"project-final/usecase"
+	"project-final/utils/common"
 
 	"github.com/gin-gonic/gin"
 )
@@ -91,7 +90,6 @@ func (r *RoomController) getByRoomtypeHandler(ctx *gin.Context) {
 		return
 	}
 
-	// fmt.Println(rspPayload.RoomType)
 	common.SendSingleResponse(ctx, "Ok", rspPayload)
 
 }

@@ -2,10 +2,11 @@ package usecase
 
 import (
 	"errors"
-	"final-project-booking-room/model"
-	"final-project-booking-room/repository"
-	"final-project-booking-room/utils/common"
-	"final-project-booking-room/utils/modelutil"
+	"project-final/model"
+	"project-final/repository"
+	"project-final/utils/common"
+	"project-final/utils/modelutil"
+
 	"fmt"
 )
 
@@ -82,9 +83,8 @@ func (u *userUseCase) RegisterNewUser(payload model.User) (model.User, error) {
 
 	if payload.IsEmpty() {
 		return model.User{}, errors.New("all fields must be filled in")
-	}
 
-		return model.User{}, errors.New("invalid role, role must admin or employee")
+		// return model.User{}, errors.New("invalid role, role must admin or employee")
 	}
 
 	newPassword, err := common.GeneratePasswordHash(payload.Password)

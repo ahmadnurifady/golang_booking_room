@@ -2,9 +2,10 @@ package usecase
 
 import (
 	"encoding/csv"
-	"final-project-booking-room/model"
-	"final-project-booking-room/model/dto"
-	"final-project-booking-room/repository"
+	"project-final/model"
+	"project-final/model/dto"
+	"project-final/repository"
+
 	"os"
 
 	"fmt"
@@ -92,11 +93,7 @@ func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (mo
 
 	statusRoom, err := b.roomUC.GetRoomStatusByBdId(id)
 	if err != nil {
-<<<<<<< HEAD
 		return model.Booking{}, fmt.Errorf(`sorry, id booking detail %s is not found`, id)
-=======
-		return model.Booking{}, fmt.Errorf("sorry, ID Booking detail %s is not found", id)
->>>>>>> c4ee3d2c094c7451cc376ffc4c8c9c540057d4a2
 	}
 
 	if statusRoom == "booked" {

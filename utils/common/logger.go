@@ -1,9 +1,9 @@
 package common
 
 import (
-	"final-project-booking-room/config"
-	"final-project-booking-room/utils/modelutil"
 	"os"
+	"project-final/config"
+	"project-final/utils/modelutil"
 
 	"github.com/sirupsen/logrus"
 )

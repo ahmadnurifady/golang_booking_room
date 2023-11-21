@@ -1,9 +1,9 @@
 package common
 
 import (
-	"final-project-booking-room/config"
-	modelutil "final-project-booking-room/utils/modelutil"
 	"net/smtp"
+	"project-final/config"
+	"project-final/utils/modelutil"
 )
 
 type EmailService interface {

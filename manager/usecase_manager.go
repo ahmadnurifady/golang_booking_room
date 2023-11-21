@@ -1,8 +1,8 @@
 package manager
 
 import (
-	"final-project-booking-room/usecase"
-	"final-project-booking-room/utils/common"
+	"project-final/usecase"
+	"project-final/utils/common"
 )
 
 type UseCaseManager interface {

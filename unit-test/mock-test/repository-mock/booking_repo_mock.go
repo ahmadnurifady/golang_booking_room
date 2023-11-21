@@ -1,7 +1,7 @@
 package repositorymock
 
 import (
-	"final-project-booking-room/model"
+	"project-final/model"
 
 	"github.com/stretchr/testify/mock"
 )

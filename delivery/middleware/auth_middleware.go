@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"final-project-booking-room/config"
-	"final-project-booking-room/utils/common"
 	"net/http"
+	"project-final/config"
+	"project-final/utils/common"
 	"strings"
 
 	"github.com/gin-gonic/gin"

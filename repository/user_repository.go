@@ -3,8 +3,9 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"final-project-booking-room/model"
-	"final-project-booking-room/utils/common"
+	"project-final/model"
+	"project-final/utils/common"
+
 	"time"
 )
 

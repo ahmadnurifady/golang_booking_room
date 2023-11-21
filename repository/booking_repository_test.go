@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"final-project-booking-room/model"
+	"project-final/model"
 	"testing"
 	"time"
 

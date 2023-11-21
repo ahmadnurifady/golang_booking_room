@@ -3,14 +3,15 @@ package delivery
 import (
 
 	// "final-project/delivery/middleware"
-	"final-project-booking-room/config"
-	"final-project-booking-room/delivery/controller"
-	"final-project-booking-room/delivery/middleware"
-	"final-project-booking-room/manager"
-	"final-project-booking-room/usecase"
-	"final-project-booking-room/utils/common"
+
 	"fmt"
 	"log"
+	"project-final/config"
+	"project-final/delivery/controller"
+	"project-final/delivery/middleware"
+	"project-final/manager"
+	"project-final/usecase"
+	"project-final/utils/common"
 
 	"github.com/gin-gonic/gin"
 )

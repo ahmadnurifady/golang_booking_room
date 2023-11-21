@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"final-project-booking-room/utils/common"
-	"final-project-booking-room/utils/modelutil"
 	"log"
+	"project-final/utils/common"
+	"project-final/utils/modelutil"
 	"time"
 
 	"github.com/gin-gonic/gin"

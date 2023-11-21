@@ -1,8 +1,8 @@
 package usecasemock
 
 import (
-	"final-project-booking-room/model"
-	"final-project-booking-room/model/dto"
+	"project-final/model"
+	"project-final/model/dto"
 
 	"github.com/stretchr/testify/mock"
 )

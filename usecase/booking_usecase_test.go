@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	repositorymock "final-project-booking-room/unit-test/mock-test/repository-mock"
-	usecasemock "final-project-booking-room/unit-test/mock-test/usecase-mock"
+	repositorymock "project-final/unit-test/mock-test/repository-mock"
+	usecasemock "project-final/unit-test/mock-test/usecase-mock"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
