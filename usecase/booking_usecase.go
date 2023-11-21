@@ -11,7 +11,7 @@ import (
 )
 
 type BookingUseCase interface {
-	RegisterNewBooking(payload dto.BookingRequestDto, roleUser string) (model.Booking, error)
+	RegisterNewBooking(payload dto.BookingRequestDto, userId string) (model.Booking, error)
 	FindById(id string, userId string, roleUser string) (model.Booking, error)
 	ViewAllBooking() ([]model.Booking, error)
 	ViewAllBookingByStatus(status string) ([]model.Booking, error)
@@ -115,7 +115,7 @@ func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (mo
 func (b *bookingUseCase) ViewAllBookingByStatus(status string) ([]model.Booking, error) {
 	bookings, err := b.repo.GetAllByStatus(status)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get data, err: %v", err)
+		return nil, fmt.Errorf("failed to get data error: %v", err)
 	}
 	return bookings, nil
 }

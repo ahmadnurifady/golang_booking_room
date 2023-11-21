@@ -15,6 +15,7 @@ type JwtToken interface {
 	GenerateToken(payload model.User) (dto.AuthResponseDto, error)
 	VerifyToken(tokenString string) (jwt.MapClaims, error)
 	RefreshToken(oldTokenString string) (dto.AuthResponseDto, error)
+	GetUserIdToken(tokenString string) (string, error)
 }
 
 type jwtToken struct {
@@ -83,6 +84,28 @@ func (j *jwtToken) VerifyToken(tokenString string) (jwt.MapClaims, error) {
 	}
 
 	return claims, nil
+}
+
+func (j *jwtToken) GetUserIdToken(tokenString string) (string, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return j.cfg.JwtSignatureKey, nil
+	})
+
+	if err != nil {
+		return "", errors.New("failed to verify token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !token.Valid || !ok || claims["iss"] != j.cfg.IssuerName {
+		return "", errors.New("invalid claim token")
+	}
+
+	userID, ok := claims["UserId"].(string)
+	if !ok {
+		return "", errors.New("userid not found in claims")
+	}
+
+	return userID, nil
 }
 
 func NewJwtToken(cfg config.TokenConfig) JwtToken {

@@ -1,6 +1,8 @@
 package manager
 
-import "final-project-booking-room/repository"
+import (
+	"final-project-booking-room/repository"
+)
 
 type RepoManager interface {
 	UserRepo() repository.UserRepository
