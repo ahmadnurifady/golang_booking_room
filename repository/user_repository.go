@@ -12,7 +12,7 @@ import (
 type UserRepository interface {
 	GetById(id string) (model.User, error)
 	Create(payload model.User) (model.User, error)
-	UpdateUserById(userId string, payload model.User) (model.User, error)
+	UpdateUserById(id string, userId string, payload model.User) (model.User, error)
 	DeleteUserById(id string) (model.User, error)
 	GetAllUser() ([]model.User, error)
 	GetByEmail(email string) (model.User, error)
@@ -69,7 +69,8 @@ func (u *userRepository) Create(payload model.User) (model.User, error) {
 }
 
 // !MENGUPDATE USER BERDASARKAN ID
-func (u *userRepository) UpdateUserById(userId string, payload model.User) (model.User, error) {
+func (u *userRepository) UpdateUserById(id string, userId string, payload model.User) (model.User, error) {
+
 	var user model.User
 	fmt.Println(userId)
 	err := u.db.QueryRow(common.UpdateUser, payload.Name, payload.Divisi, payload.Jabatan,

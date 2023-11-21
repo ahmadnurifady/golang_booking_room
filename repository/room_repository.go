@@ -129,7 +129,7 @@ func (r *roomRepository) ChangeStatus(id string) error {
 	status := "available"
 	_, err := r.db.Exec(`UPDATE rooms SET status = $1 WHERE id = $2`, status, id)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	return err
 }
@@ -202,7 +202,7 @@ func (r *roomRepository) Update(id string, payload model.Room) (model.Room, erro
 		&room.UpdatedAt,
 	)
 	if err != nil {
-		panic(err)
+		return model.Room{}, err
 	}
 
 	facilitie.Id = room.Facility.Id
@@ -226,7 +226,7 @@ func (r *roomRepository) Update(id string, payload model.Room) (model.Room, erro
 		&facilitie.UpdatedAt,
 	)
 	if err != nil {
-		panic(err)
+		return model.Room{}, err
 	}
 
 	room.Facility = facilitie

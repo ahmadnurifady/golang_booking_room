@@ -92,7 +92,7 @@ func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (mo
 
 	statusRoom, err := b.roomUC.GetRoomStatusByBdId(id)
 	if err != nil {
-		return model.Booking{}, fmt.Errorf("sorry, ID Booking detail %s is not found", id)
+		return model.Booking{}, fmt.Errorf(`sorry, id booking detail %s is not found`, id)
 	}
 
 	if statusRoom == "booked" {

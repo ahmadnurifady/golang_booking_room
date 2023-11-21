@@ -14,7 +14,7 @@ type UserUseCase interface {
 	RegisterNewUser(payload model.User) (model.User, error)
 	DeleteUser(id string) (model.User, error)
 	ViewAllUser() ([]model.User, error)
-	UpdateUserById(id string, payload model.User) (model.User, error)
+	UpdateUserById(id string, userId string, payload model.User) (model.User, error)
 	FindByEmailPassword(email string, password string) (model.User, error)
 }
 
@@ -39,20 +39,15 @@ func (u *userUseCase) FindByEmailPassword(email string, password string) (model.
 }
 
 // UpdateUserById implements UserUseCase.
-func (u *userUseCase) UpdateUserById(userId string, payload model.User) (model.User, error) {
-	user, err := u.repo.GetById(userId)
+func (u *userUseCase) UpdateUserById(id string, userId string, payload model.User) (model.User, error) {
+	newPassword, err := common.GeneratePasswordHash(payload.Password)
 	if err != nil {
-		return model.User{}, fmt.Errorf("user with ID %s not found", userId)
+		return model.User{}, err
 	}
 
-	var updateUser model.User
+	payload.Password = newPassword
 
-	updateUser, err = u.repo.UpdateUserById(user.Id, updateUser)
-	if err != nil {
-		return model.User{}, fmt.Errorf("failed to update : %s", err)
-	}
-
-	return updateUser, nil
+	return u.repo.UpdateUserById(id, userId, payload)
 }
 
 // ViewAllUser implements UserUseCase.
@@ -82,11 +77,13 @@ func (u *userUseCase) DeleteUser(id string) (model.User, error) {
 
 func (u *userUseCase) RegisterNewUser(payload model.User) (model.User, error) {
 	if !payload.IsValidRole() {
-		return model.User{}, errors.New("invalid role, role must admin or employee")
+		return model.User{}, errors.New("invalid role, role must be admin or employee")
 	}
-	if !payload.IsEmpty() {
+
+	if payload.IsEmpty() {
 		return model.User{}, errors.New("all fields must be filled in")
 	}
+
 	newPassword, err := common.GeneratePasswordHash(payload.Password)
 	if err != nil {
 		return model.User{}, err

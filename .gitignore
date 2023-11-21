@@ -2,7 +2,12 @@ Report.csv
 .env
 /tmp
 go.sum
+<<<<<<< HEAD
 >>>>>>> master
 logger.log
 cover.out
 go.mod
+=======
+cover.out
+logger.log
+>>>>>>> 2053fab1dab632b60da842b833d2cd7048641f0a

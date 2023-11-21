@@ -2,6 +2,7 @@ package controller
 
 import (
 	"final-project-booking-room/config"
+	"final-project-booking-room/delivery/middleware"
 	"final-project-booking-room/model"
 	"final-project-booking-room/usecase"
 	"final-project-booking-room/utils/common"
@@ -11,8 +12,9 @@ import (
 )
 
 type UserController struct {
-	uc usecase.UserUseCase
-	rg *gin.RouterGroup
+	uc             usecase.UserUseCase
+	rg             *gin.RouterGroup
+	authMiddleware middleware.AuthMiddleware
 }
 
 func (u *UserController) getAllHandler(ctx *gin.Context) {
@@ -35,7 +37,7 @@ func (u *UserController) createHandler(ctx *gin.Context) {
 
 	rspPayload, err := u.uc.RegisterNewUser(payload)
 	if err != nil {
-		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -43,6 +45,11 @@ func (u *UserController) createHandler(ctx *gin.Context) {
 }
 
 func (u *UserController) UpdateUserHandler(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id == "" {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
+		return
+	}
 
 	var payload model.User
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
@@ -50,9 +57,11 @@ func (u *UserController) UpdateUserHandler(ctx *gin.Context) {
 		return
 	}
 	userId := ctx.MustGet(config.UserSesion).(string)
-	rspPayload, err := u.uc.UpdateUserById(userId, payload)
+	payload.Id = id
+
+	rspPayload, err := u.uc.UpdateUserById(payload.Id, userId, payload)
 	if err != nil {
-		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -93,13 +102,13 @@ func (u *UserController) DeleteByIdHandler(ctx *gin.Context) {
 
 func (u *UserController) Route() {
 	ur := u.rg.Group(config.UserGroup)
-	ur.POST(config.UserPost, u.createHandler)
-	ur.PUT(config.UserUpdate, u.UpdateUserHandler)
-	ur.GET(config.UserGet, u.getByIdHandler)
-	ur.DELETE(config.UserDelete, u.DeleteByIdHandler)
-	ur.GET(config.UserGetAll, u.getAllHandler)
+	ur.POST(config.UserPost, u.authMiddleware.RequireToken("admin"), u.createHandler)
+	ur.PUT(config.UserUpdate, u.authMiddleware.RequireToken("admin", "employee"), u.UpdateUserHandler)
+	ur.GET(config.UserGet, u.authMiddleware.RequireToken("admin"), u.getByIdHandler)
+	ur.DELETE(config.UserDelete, u.authMiddleware.RequireToken("admin"), u.DeleteByIdHandler)
+	ur.GET(config.UserGetAll, u.authMiddleware.RequireToken("admin"), u.getAllHandler)
 
 }
-func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup) *UserController {
-	return &UserController{uc: uc, rg: rg}
+func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup, authmiddleware middleware.AuthMiddleware) *UserController {
+	return &UserController{uc: uc, rg: rg, authMiddleware: authmiddleware}
 }
