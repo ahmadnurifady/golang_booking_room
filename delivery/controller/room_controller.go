@@ -42,7 +42,7 @@ func (r *RoomController) getAllRoomByStatus(ctx *gin.Context) {
 	}
 	rspPayload, err := r.uc.GetAllRoomByStatus(status)
 	if err != nil {
-		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -136,14 +136,12 @@ func (r *RoomController) updateHandler(ctx *gin.Context) {
 	}
 
 	var roomUpdate model.Room
-
-	roomUpdate.Id = id
-
 	err := ctx.ShouldBindJSON(&roomUpdate)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+		panic(err.Error())
 	}
+
+	roomUpdate.Id = id
 
 	roomUpdate, err = r.uc.UpdateById(roomUpdate.Id, roomUpdate)
 	if err != nil {

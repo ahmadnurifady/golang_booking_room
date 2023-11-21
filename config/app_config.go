@@ -6,7 +6,7 @@ const (
 	RoleSesion = "roleUser"
 
 	DownloadReport = "/download"
-	UserAdmin      = "08f0cea4-2d3e-40e6-b2ee-18c7ec5507d8"
+	UserAdmin      = "510068c3-8172-48ce-8d5b-ecb3de591b51"
 
 	AuthGroup        = "/auth"
 	AuthRegister     = "/register"
