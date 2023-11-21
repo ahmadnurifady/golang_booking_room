@@ -29,7 +29,7 @@ func (s *Server) setupControllers() {
 	s.engine.Use(middleware.NewLogMiddleware(s.logService).LogRequest())
 	authMiddlerware := middleware.NewAuthMiddleware(s.jwtService)
 	rg := s.engine.Group("/api/v1")
-	controller.NewUserController(s.uc.UserUseCase(), rg).Route()
+	controller.NewUserController(s.uc.UserUseCase(), rg, authMiddlerware).Route()
 	controller.NewBookingController(s.uc.BookingUsecase(), rg, authMiddlerware).Route()
 	controller.NewAuthController(s.auth, rg, s.jwtService).Route()
 	controller.NewRoomController(s.uc.RoomUsecase(), rg, authMiddlerware).Route()
