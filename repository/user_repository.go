@@ -3,7 +3,6 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"final-project-booking-room/config"
 	"final-project-booking-room/model"
 	"final-project-booking-room/utils/common"
 	"time"
@@ -12,15 +11,14 @@ import (
 type UserRepository interface {
 	GetById(id string) (model.User, error)
 	Create(payload model.User) (model.User, error)
-	UpdateUserById(tokenString string, payload model.User) (model.User, error)
+	UpdateUserById(id string, userId string, payload model.User) (model.User, error)
 	DeleteUserById(id string) (model.User, error)
 	GetAllUser() ([]model.User, error)
 	GetByEmail(email string) (model.User, error)
 }
 
 type userRepository struct {
-	db   *sql.DB
-	cfgt config.TokenConfig
+	db *sql.DB
 }
 
 // MENCARI USER BERDASARKAN EMAIL => UNTUK LOGIN
@@ -70,16 +68,11 @@ func (u *userRepository) Create(payload model.User) (model.User, error) {
 }
 
 // !MENGUPDATE USER BERDASARKAN ID
-func (u *userRepository) UpdateUserById(tokenString string, payload model.User) (model.User, error) {
-	GetToken := common.NewJwtToken(config.TokenConfig{})
-	userID, err := GetToken.GetUserIdToken(tokenString)
-	if err != nil {
-		return model.User{}, errors.New("failed to get UserID from token")
-	}
+func (u *userRepository) UpdateUserById(id string, userId string, payload model.User) (model.User, error) {
 
 	var user model.User
-	err = u.db.QueryRow(common.UpdateUser, payload.Name, payload.Divisi, payload.Jabatan,
-		payload.Email, payload.Password, payload.Role, time.Now(), userID).
+	err := u.db.QueryRow(common.UpdateUser, payload.Name, payload.Divisi, payload.Jabatan,
+		payload.Email, payload.Password, payload.Role, time.Now(), id).
 		Scan(&user.Id, &user.Name, &user.Divisi, &user.Jabatan, &user.Email, &user.Role, &user.UpdatedAt)
 
 	if err != nil {
@@ -125,6 +118,6 @@ func (u *userRepository) GetAllUser() ([]model.User, error) {
 	return users, nil
 }
 
-func NewUserRepository(db *sql.DB, cfgt config.TokenConfig) UserRepository {
-	return &userRepository{db: db, cfgt: cfgt}
+func NewUserRepository(db *sql.DB) UserRepository {
+	return &userRepository{db: db}
 }

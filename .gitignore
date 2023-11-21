@@ -2,5 +2,5 @@ Report.csv
 .env
 /tmp
 go.sum
->>>>>>> master
+cover.out
 logger.log

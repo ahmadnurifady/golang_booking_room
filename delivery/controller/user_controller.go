@@ -45,9 +45,9 @@ func (u *UserController) createHandler(ctx *gin.Context) {
 }
 
 func (u *UserController) UpdateUserHandler(ctx *gin.Context) {
-	tokenString := ctx.GetHeader("Authorization")
-	if tokenString == "" {
-		common.SendErrorResponse(ctx, http.StatusUnauthorized, "Authorization header is missing")
+	id := ctx.Param("id")
+	if id == "" {
+		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
 		return
 	}
 
@@ -56,8 +56,10 @@ func (u *UserController) UpdateUserHandler(ctx *gin.Context) {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
+	userId := ctx.MustGet(config.UserSesion).(string)
+	payload.Id = id
 
-	rspPayload, err := u.uc.UpdateUserById(payload.Id, payload)
+	rspPayload, err := u.uc.UpdateUserById(payload.Id, userId, payload)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return

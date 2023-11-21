@@ -14,7 +14,7 @@ type UserUseCase interface {
 	RegisterNewUser(payload model.User) (model.User, error)
 	DeleteUser(id string) (model.User, error)
 	ViewAllUser() ([]model.User, error)
-	UpdateUserById(tokenString string, payload model.User) (model.User, error)
+	UpdateUserById(id string, userId string, payload model.User) (model.User, error)
 	FindByEmailPassword(email string, password string) (model.User, error)
 }
 
@@ -39,7 +39,7 @@ func (u *userUseCase) FindByEmailPassword(email string, password string) (model.
 }
 
 // UpdateUserById implements UserUseCase.
-func (u *userUseCase) UpdateUserById(tokenString string, payload model.User) (model.User, error) {
+func (u *userUseCase) UpdateUserById(id string, userId string, payload model.User) (model.User, error) {
 	newPassword, err := common.GeneratePasswordHash(payload.Password)
 	if err != nil {
 		return model.User{}, err
@@ -47,7 +47,7 @@ func (u *userUseCase) UpdateUserById(tokenString string, payload model.User) (mo
 
 	payload.Password = newPassword
 
-	return u.repo.UpdateUserById(tokenString, payload)
+	return u.repo.UpdateUserById(id, userId, payload)
 }
 
 // ViewAllUser implements UserUseCase.
