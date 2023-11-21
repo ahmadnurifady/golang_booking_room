@@ -84,6 +84,9 @@ func (u *userUseCase) RegisterNewUser(payload model.User) (model.User, error) {
 		return model.User{}, errors.New("all fields must be filled in")
 	}
 
+		return model.User{}, errors.New("invalid role, role must admin or employee")
+	}
+
 	newPassword, err := common.GeneratePasswordHash(payload.Password)
 	if err != nil {
 		return model.User{}, err

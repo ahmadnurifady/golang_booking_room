@@ -94,6 +94,51 @@ func (suite *RoomRepositoryTestSuite) TestCreateRoom_Success() {
 
 }
 
+func (suite *RoomRepositoryTestSuite) TestGetByRoomType() {
+	mockRoom := model.Room{
+		Id:          "1",
+		RoomType:    "test",
+		MaxCapacity: 10,
+		Facility: model.RoomFacility{
+			Id:               "1",
+			RoomDescription:  "ruangan test",
+			Fwifi:            "ada",
+			FsoundSystem:     "ada",
+			Fprojector:       "ada",
+			FscreenProjector: "ada",
+			Fchairs:          "ada",
+			Ftables:          "ada",
+			FsoundProof:      "ada",
+			FsmonkingArea:    "ada",
+			Ftelevison:       "ada",
+			FAc:              "ada",
+			Fbathroom:        "ada",
+			FcoffeMaker:      "ada",
+			CreatedAt:        time.Time{},
+			UpdatedAt:        time.Time{},
+		},
+		Status:    "available",
+		CreatedAt: time.Time{},
+		UpdatedAt: time.Time{},
+	}
+
+	rows := sqlmock.NewRows([]string{"id", "roomtype", "capacity", "id", "roomdescription", "fwifi", "fsoundsystem", "fprojector", "fscreenprojector", "fchairs", "ftables", "fsoundproof", "fsmonkingarea", "ftelevison", "fac", "fbathroom", "fcoffemaker", "createdat", "updatedat", "status", "createdat", "updatedat"}).
+		AddRow(mockRoom.Id, mockRoom.RoomType, mockRoom.MaxCapacity,
+			mockRoom.Facility.Id, mockRoom.Facility.RoomDescription, mockRoom.Facility.Fwifi,
+			mockRoom.Facility.FsoundSystem, mockRoom.Facility.Fprojector, mockRoom.Facility.FscreenProjector,
+			mockRoom.Facility.Fchairs, mockRoom.Facility.Ftables, mockRoom.Facility.FsoundProof,
+			mockRoom.Facility.FsmonkingArea, mockRoom.Facility.Ftelevison, mockRoom.Facility.FAc,
+			mockRoom.Facility.Fbathroom, mockRoom.Facility.FcoffeMaker, mockRoom.Facility.CreatedAt,
+			mockRoom.Facility.UpdatedAt, mockRoom.Status, mockRoom.CreatedAt, mockRoom.UpdatedAt)
+	suite.mockSql.ExpectQuery("SELECT").WillReturnRows(rows)
+
+	actual, err := suite.repo.GetByRoomType(mockRoom.RoomType)
+	assert.Nil(suite.T(), err)
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), mockRoom.RoomType, actual)
+
+}
+
 func (suite *RoomRepositoryTestSuite) TestGetRoom_Success() {
 
 	// expectedRoom := model.Room{

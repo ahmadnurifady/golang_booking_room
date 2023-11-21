@@ -11,7 +11,7 @@ import (
 )
 
 type BookingUseCase interface {
-	RegisterNewBooking(payload dto.BookingRequestDto, roleUser string) (model.Booking, error)
+	RegisterNewBooking(payload dto.BookingRequestDto, userId string) (model.Booking, error)
 	FindById(id string, userId string, roleUser string) (model.Booking, error)
 	ViewAllBooking() ([]model.Booking, error)
 	ViewAllBookingByStatus(status string) ([]model.Booking, error)
@@ -92,7 +92,11 @@ func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (mo
 
 	statusRoom, err := b.roomUC.GetRoomStatusByBdId(id)
 	if err != nil {
+<<<<<<< HEAD
 		return model.Booking{}, fmt.Errorf(`sorry, id booking detail %s is not found`, id)
+=======
+		return model.Booking{}, fmt.Errorf("sorry, ID Booking detail %s is not found", id)
+>>>>>>> c4ee3d2c094c7451cc376ffc4c8c9c540057d4a2
 	}
 
 	if statusRoom == "booked" {
@@ -115,7 +119,7 @@ func (b *bookingUseCase) UpdateStatusBookAndRoom(id string, approval string) (mo
 func (b *bookingUseCase) ViewAllBookingByStatus(status string) ([]model.Booking, error) {
 	bookings, err := b.repo.GetAllByStatus(status)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get data, err: %v", err)
+		return nil, fmt.Errorf("failed to get data error: %v", err)
 	}
 	return bookings, nil
 }

@@ -4,3 +4,5 @@ Report.csv
 go.sum
 >>>>>>> master
 logger.log
+cover.out
+go.mod
