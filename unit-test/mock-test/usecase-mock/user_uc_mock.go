@@ -29,8 +29,8 @@ func (u *UserUseCaseMock) RegisterNewUser(payload model.User) (model.User, error
 }
 
 // UpdateUserById implements usecase.UserUseCase.
-func (u *UserUseCaseMock) UpdateUserById(id string, userId string, payload model.User) (model.User, error) {
-	args := u.Called(id, userId, payload)
+func (u *UserUseCaseMock) UpdateUserById(userId string, payload model.User) (model.User, error) {
+	args := u.Called(userId, payload)
 	return args.Get(0).(model.User), args.Error(1)
 }
 

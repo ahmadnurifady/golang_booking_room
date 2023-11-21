@@ -45,11 +45,11 @@ func (u *UserController) createHandler(ctx *gin.Context) {
 }
 
 func (u *UserController) UpdateUserHandler(ctx *gin.Context) {
-	id := ctx.Param("id")
-	if id == "" {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
-		return
-	}
+	// id := ctx.Param("id")
+	// if id == "" {
+	// 	common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
+	// 	return
+	// }
 
 	var payload model.User
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
@@ -57,9 +57,7 @@ func (u *UserController) UpdateUserHandler(ctx *gin.Context) {
 		return
 	}
 	userId := ctx.MustGet(config.UserSesion).(string)
-	payload.Id = id
-
-	rspPayload, err := u.uc.UpdateUserById(payload.Id, userId, payload)
+	rspPayload, err := u.uc.UpdateUserById(userId, payload)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
