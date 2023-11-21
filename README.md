@@ -55,7 +55,7 @@ Response :
 
 Request :
 
-- Method : GET
+- Method : `GET`
 - Endpoint : `/employees/:id`
 - Header :
   - Accept : application/json
@@ -83,7 +83,7 @@ Response :
 
 Request :
 
-- Method : PUT
+- Method : `PUT`
 - Endpoint : `/employees/:id`
 - Header :
   - Content-Type : application/json
@@ -124,7 +124,7 @@ Response :
 
 Request :
 
-- Method : DELETE
+- Method : `DELETE`
 - Endpoint : `/employees/:id`
 - Header :
   - Accept : application/json
@@ -146,7 +146,7 @@ Response :
 
 Request :
 
-- Method : GET
+- Method : `GET`
 - Endpoint : `/employees`
 - Header :
   - Accept : application/json
@@ -169,9 +169,6 @@ Response :
     "role": "string"
   }
 }
-`
-
-
 ```
 
 ### Booking
@@ -347,7 +344,7 @@ Response :
 
 Request :
 
-- Method : GET
+- Method : `GET`
 - Endpoint : `/booking`
 - Header :
   - Accept : application/json
@@ -371,7 +368,7 @@ Response :
 
 Request :
 
-- Method : GET
+- Method : `GET`
 - Endpoint : `/booking/status/:status` ("pending", "accept", "decline")
 - Header :
   - Accept : application/json
@@ -395,7 +392,7 @@ Response :
 
 Request :
 
-- Method : GET
+- Method : `GET`
 - Endpoint : `/booking/approval`
 - Header :
   - Accept : application/json
