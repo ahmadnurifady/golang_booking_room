@@ -49,8 +49,8 @@ func (u *UserController) UpdateUserHandler(ctx *gin.Context) {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
-
-	rspPayload, err := u.uc.UpdateUserById(payload.Id, payload)
+	userId := ctx.MustGet(config.UserSesion).(string)
+	rspPayload, err := u.uc.UpdateUserById(userId, payload)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return

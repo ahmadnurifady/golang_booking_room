@@ -39,10 +39,10 @@ func (u *userUseCase) FindByEmailPassword(email string, password string) (model.
 }
 
 // UpdateUserById implements UserUseCase.
-func (u *userUseCase) UpdateUserById(id string, payload model.User) (model.User, error) {
-	user, err := u.repo.GetById(id)
+func (u *userUseCase) UpdateUserById(userId string, payload model.User) (model.User, error) {
+	user, err := u.repo.GetById(userId)
 	if err != nil {
-		return model.User{}, fmt.Errorf("user with ID %s not found", id)
+		return model.User{}, fmt.Errorf("user with ID %s not found", userId)
 	}
 
 	var updateUser model.User

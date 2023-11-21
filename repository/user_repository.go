@@ -5,13 +5,14 @@ import (
 	"errors"
 	"final-project-booking-room/model"
 	"final-project-booking-room/utils/common"
+	"fmt"
 	"time"
 )
 
 type UserRepository interface {
 	GetById(id string) (model.User, error)
 	Create(payload model.User) (model.User, error)
-	UpdateUserById(id string, payload model.User) (model.User, error)
+	UpdateUserById(userId string, payload model.User) (model.User, error)
 	DeleteUserById(id string) (model.User, error)
 	GetAllUser() ([]model.User, error)
 	GetByEmail(email string) (model.User, error)
@@ -68,10 +69,11 @@ func (u *userRepository) Create(payload model.User) (model.User, error) {
 }
 
 // !MENGUPDATE USER BERDASARKAN ID
-func (u *userRepository) UpdateUserById(id string, payload model.User) (model.User, error) {
+func (u *userRepository) UpdateUserById(userId string, payload model.User) (model.User, error) {
 	var user model.User
+	fmt.Println(userId)
 	err := u.db.QueryRow(common.UpdateUser, payload.Name, payload.Divisi, payload.Jabatan,
-		payload.Email, payload.Password, payload.Role, time.Now(), id).
+		payload.Email, payload.Password, payload.Role, time.Now(), userId).
 		Scan(&user.Id, &user.Name, &user.Divisi, &user.Jabatan, &user.Email, &user.Role, &user.UpdatedAt)
 
 	if err != nil {
