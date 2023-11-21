@@ -4,6 +4,7 @@ import (
 	"final-project-booking-room/model"
 	"final-project-booking-room/repository"
 	"fmt"
+	"strings"
 )
 
 type RoomUseCase interface {
@@ -85,12 +86,68 @@ func (r *roomUseCase) FindByRoomType(roomType string) (model.Room, error) {
 // UpdateById implements RoomUseCase.
 func (r *roomUseCase) UpdateById(id string, payload model.Room) (model.Room, error) {
 
-	_, err := r.repo.Get(id)
+	updatedRoom, err := r.repo.Get(id)
 	if err != nil {
 		return model.Room{}, fmt.Errorf("room with id %s not found", id)
 	}
 
-	return r.repo.Update(id, payload)
+	if updatedRoom.Id == id {
+		if strings.TrimSpace(payload.RoomType) != "" {
+			updatedRoom.RoomType = payload.RoomType
+		}
+		if payload.MaxCapacity != 0 {
+			updatedRoom.MaxCapacity = payload.MaxCapacity
+		}
+		if strings.TrimSpace(payload.Status) != "" {
+			updatedRoom.Status = payload.Status
+		}
+		if strings.TrimSpace(payload.Facility.RoomDescription) != "" {
+			updatedRoom.Facility.RoomDescription = payload.Facility.RoomDescription
+		}
+		if strings.TrimSpace(payload.Facility.Fwifi) != "" {
+			updatedRoom.Facility.Fwifi = payload.Facility.Fwifi
+		}
+		if strings.TrimSpace(payload.Facility.FsoundSystem) != "" {
+			updatedRoom.Facility.FsoundSystem = payload.Facility.FsoundSystem
+		}
+		if strings.TrimSpace(payload.Facility.Fprojector) != "" {
+			updatedRoom.Facility.Fprojector = payload.Facility.Fprojector
+		}
+		if strings.TrimSpace(payload.Facility.FscreenProjector) != "" {
+			updatedRoom.Facility.FscreenProjector = payload.Facility.FscreenProjector
+		}
+		if strings.TrimSpace(payload.Facility.Fchairs) != "" {
+			updatedRoom.Facility.Fchairs = payload.Facility.Fchairs
+		}
+		if strings.TrimSpace(payload.Facility.Ftables) != "" {
+			updatedRoom.Facility.Ftables = payload.Facility.Ftables
+		}
+		if strings.TrimSpace(payload.Facility.FsoundProof) != "" {
+			updatedRoom.Facility.FsoundProof = payload.Facility.FsoundProof
+		}
+		if strings.TrimSpace(payload.Facility.FsmonkingArea) != "" {
+			updatedRoom.Facility.FsmonkingArea = payload.Facility.FsmonkingArea
+		}
+		if strings.TrimSpace(payload.Facility.Ftelevison) != "" {
+			updatedRoom.Facility.Ftelevison = payload.Facility.Ftelevison
+		}
+		if strings.TrimSpace(payload.Facility.FAc) != "" {
+			updatedRoom.Facility.FAc = payload.Facility.FAc
+		}
+		if strings.TrimSpace(payload.Facility.Fbathroom) != "" {
+			updatedRoom.Facility.Fbathroom = payload.Facility.Fbathroom
+		}
+		if strings.TrimSpace(payload.Facility.FcoffeMaker) != "" {
+			updatedRoom.Facility.FcoffeMaker = payload.Facility.FcoffeMaker
+		}
+	}
+
+	update, err := r.repo.Update(id, updatedRoom)
+	if err != nil {
+		return model.Room{}, err
+	}
+
+	return update, err
 }
 
 // DeleteById implements RoomUseCase.
