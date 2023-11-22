@@ -60,7 +60,6 @@ func (s *UserRepositoryTestSuite) TestCreateUser_Success() {
 
 func (s *UserRepositoryTestSuite) TestGetAllUser_Success() {
 
-	// Define mock users
 	mockUsers := []model.User{
 		{
 			Id:        "1",
@@ -72,22 +71,17 @@ func (s *UserRepositoryTestSuite) TestGetAllUser_Success() {
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
-		// Add more mock users as needed
 	}
 
-	// Set expectations on the SQL mock
 	s.mockSql.ExpectQuery(common.GetAllUser).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "divisi", "jabatan", "email", "role", "createdat", "updatedat"}).
 			AddRow(mockUsers[0].Id, mockUsers[0].Name, mockUsers[0].Divisi, mockUsers[0].Jabatan, mockUsers[0].Email, mockUsers[0].Role, mockUsers[0].CreatedAt, mockUsers[0].UpdatedAt))
 
-	// Call the GetAllUser method
 	actualUsers, err := s.repo.GetAllUser()
 
-	// Check for errors
 	assert.NoError(s.T(), err, "Unexpected error in GetAllUser method")
 	assert.Equal(s.T(), mockUsers, actualUsers, "Returned users do not match expected users")
 
-	// Ensure all expectations were met
 	assert.Nil(s.T(), s.mockSql.ExpectationsWereMet(), "Not all SQL expectations were met")
 }
 
@@ -180,22 +174,18 @@ func (s *UserRepositoryTestSuite) TestGetUserByEmail_Success() {
 		Divisi:   "Engineering",
 		Jabatan:  "Software Engineer",
 		Email:    email,
-		Password: "hashed_password", // Adjust this based on your actual implementation
+		Password: "hashed_password",
 		Role:     "user",
 	}
 
-	// Expect the QueryRow and Scan operations
 	rows := sqlmock.NewRows([]string{"id", "name", "divisi", "jabatan", "email", "password", "role"}).
 		AddRow(mockUser.Id, mockUser.Name, mockUser.Divisi, mockUser.Jabatan, mockUser.Email, mockUser.Password, mockUser.Role)
 	s.mockSql.ExpectQuery("SELECT id, name, divisi, jabatan, email, password, role FROM users WHERE email = ?").WithArgs("john.doe@example.com").WillReturnRows(rows)
 
-	// Call the GetByEmail method with the mocked database
 	result, err := s.repo.GetByEmail(email)
 
-	// Assert that there are no unfulfilled expectations
 	require.NoError(s.T(), s.mockSql.ExpectationsWereMet())
 
-	// Assert the result and error
 	require.NoError(s.T(), err, "Unexpected error in GetByEmail method")
 	require.Equal(s.T(), mockUser, result)
 }

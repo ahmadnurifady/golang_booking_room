@@ -47,7 +47,6 @@ func (e *emailService) SendEmailFile(payload modelutil.BodySender) error {
 		return fmt.Errorf("error reading CSV file: %v", err)
 	}
 
-	// Encode file contents to base64
 	encodedContents := base64.StdEncoding.EncodeToString(contents)
 
 	message := "From: " + e.cfg.EmailFrom + "\n" +

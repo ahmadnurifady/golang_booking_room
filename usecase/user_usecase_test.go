@@ -2,8 +2,10 @@ package usecase
 
 import (
 	"final-project-booking-room/model"
-	repomock "final-project-booking-room/unit-test/mock-test/repository-mock"
+	repositorymock "final-project-booking-room/unit-test/mock-test/repository-mock"
 	usecasemock "final-project-booking-room/unit-test/mock-test/usecase-mock"
+	"fmt"
+	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
@@ -13,14 +15,18 @@ import (
 type UserUseCaseTestSuite struct {
 	suite.Suite
 	uc  UserUseCase
-	urm *repomock.UserRepoMock
+	urm *repositorymock.UserRepositoryMock
 	ues *usecasemock.EmailServiceMock
 }
 
 func (suite *UserUseCaseTestSuite) SetupTest() {
 	suite.ues = new(usecasemock.EmailServiceMock)
-	suite.urm = new(repomock.UserRepoMock)
+	suite.urm = new(repositorymock.UserRepositoryMock)
 	suite.uc = NewUserUseCase(suite.urm, suite.ues)
+}
+
+func TestUserUseCaseTestSuite(t *testing.T) {
+	suite.Run(t, new(UserUseCaseTestSuite))
 }
 
 var sampleMockUser []model.User
@@ -37,28 +43,54 @@ var mockUser = model.User{
 	UpdatedAt: time.Time{},
 }
 
-func (suite *UserUseCaseTestSuite) TestRegisterNewUser_Success() {
-	suite.urm.On("Create", mockUser).Return(mockUser, nil)
-	_, err := suite.uc.RegisterNewUser(mockUser)
-	assert.Nil(suite.T(), err)
-	assert.NoError(suite.T(), err)
+func (suite *UserUseCaseTestSuite) TestGetAllUser_Success() {
+	mockError := fmt.Errorf("an error occurred")
+
+	suite.urm.On("GetAllUser").Return(sampleMockUser, mockError)
+
+	result, err := suite.uc.ViewAllUser()
+
+	suite.urm.AssertCalled(suite.T(), "GetAllUser")
+
+	assert.Error(suite.T(), err)
+	assert.EqualError(suite.T(), err, "failed to get all user : an error occurred")
+
+	assert.Nil(suite.T(), result)
 }
 
-func (suite *UserUseCaseTestSuite) TestViewAllUser_Success() {
-	suite.urm.On("Create", mockUser).Return(mockUser, nil)
+func (s *UserUseCaseTestSuite) TestGetById_Success() {
+	s.urm.On("GetById", "1").Return(mockUser, nil)
 
-	// Act
-	result, err := suite.uc.RegisterNewUser(mockUser)
+	resultUser, err := s.uc.FindById("1")
 
-	// Assert
-	suite.NoError(err)
-	suite.Equal(mockUser, result)
-	suite.urm.AssertExpectations(suite.T())
+	assert.NoError(s.T(), err, "Unexpected error")
+	assert.Equal(s.T(), mockUser, resultUser, "User not as expected")
+
+	s.urm.On("GetById", "nonexistent").Return(model.User{}, fmt.Errorf("user not found"))
+
+	_, err = s.uc.FindById("nonexistent")
+
+	assert.Error(s.T(), err, "Expected error for user not found")
+	assert.EqualError(s.T(), err, "user with ID nonexistent not found", "Error message not as expected")
+
+	s.urm.AssertExpectations(s.T())
 }
 
-func (suite *UserUseCaseTestSuite) TestDeleteById_Success() {
-	suite.urm.On("Delete", mockUser.Id).Return(mockUser, nil)
-	_, err := suite.uc.DeleteUser(mockUser.Id)
-	assert.Nil(suite.T(), err)
-	assert.NoError(suite.T(), err)
+func (s *UserUseCaseTestSuite) TestDeleteById_Success() {
+
+	s.urm.On("DeleteUserById", "1").Return(mockUser, nil)
+
+	resultUser, err := s.uc.DeleteUser("1")
+
+	assert.NoError(s.T(), err, "Unexpected error")
+	assert.Equal(s.T(), mockUser, resultUser, "User not as expected")
+
+	s.urm.On("DeleteUserById", "nonexistent").Return(model.User{}, fmt.Errorf("user not found"))
+
+	_, err = s.uc.DeleteUser("nonexistent")
+
+	assert.Error(s.T(), err, "Expected error for user not found")
+	assert.EqualError(s.T(), err, "user with ID nonexistent not found", "Error message not as expected")
+
+	s.urm.AssertExpectations(s.T())
 }

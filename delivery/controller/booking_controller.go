@@ -106,7 +106,6 @@ func (b *BookingController) sendReportHandler(ctx *gin.Context) {
 		return
 	}
 
-	// Convert toEmail to JSON string for DownloadReport
 	requestJSON, err := json.Marshal(map[string]string{"to": toEmail})
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusInternalServerError, "Error marshaling JSON")

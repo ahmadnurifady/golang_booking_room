@@ -41,7 +41,7 @@ func (b *bookingUseCase) DownloadReport() ([]model.Booking, error) {
 		return nil, err
 	}
 
-	file, err := os.Create("Report.xlsx") // Change file extension to .xlsx
+	file, err := os.Create("Report.xlsx")
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (b *bookingUseCase) DownloadReport() ([]model.Booking, error) {
 			}
 
 			for colIndex, cellValue := range data {
-				cell := fmt.Sprintf("%c%d", 'A'+colIndex, rowIndex+2) // Add 2 to rowIndex to skip header row
+				cell := fmt.Sprintf("%c%d", 'A'+colIndex, rowIndex+2)
 				xlsx.SetCellValue(sheetName, cell, cellValue)
 			}
 		}
