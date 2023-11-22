@@ -18,7 +18,7 @@ type useCaseManager struct {
 
 // BookingUsecase implements UseCaseManager.
 func (u *useCaseManager) BookingUsecase() usecase.BookingUseCase {
-	return usecase.NewBookingUseCase(u.repo.BookingRepo(), u.UserUseCase(), u.RoomUsecase())
+	return usecase.NewBookingUseCase(u.repo.BookingRepo(), u.UserUseCase(), u.RoomUsecase(), u.email)
 }
 
 // RoomUsecase implements UseCaseManager.

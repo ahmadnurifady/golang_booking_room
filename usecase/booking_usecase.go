@@ -1,13 +1,17 @@
 package usecase
 
 import (
-	"encoding/csv"
+	"encoding/json"
 	"final-project-booking-room/model"
 	"final-project-booking-room/model/dto"
 	"final-project-booking-room/repository"
+	"final-project-booking-room/utils/common"
+	"final-project-booking-room/utils/modelutil"
 	"os"
 
 	"fmt"
+
+	"github.com/360EntSecGroup-Skylar/excelize"
 )
 
 type BookingUseCase interface {
@@ -17,11 +21,18 @@ type BookingUseCase interface {
 	ViewAllBookingByStatus(status string) ([]model.Booking, error)
 	UpdateStatusBookAndRoom(id string, approval string) (model.Booking, error)
 	DownloadReport() ([]model.Booking, error)
+	SendReport(requestJSON string) ([]model.Booking, error)
 }
+
+type EmailRecipient struct {
+	To string `json:"to"`
+}
+
 type bookingUseCase struct {
-	repo   repository.BookingRepository
-	userUC UserUseCase
-	roomUC RoomUseCase
+	repo         repository.BookingRepository
+	userUC       UserUseCase
+	roomUC       RoomUseCase
+	emailService common.EmailService
 }
 
 func (b *bookingUseCase) DownloadReport() ([]model.Booking, error) {
@@ -30,23 +41,24 @@ func (b *bookingUseCase) DownloadReport() ([]model.Booking, error) {
 		return nil, err
 	}
 
-	file, err := os.Create("Report.csv")
+	file, err := os.Create("Report.xlsx") // Change file extension to .xlsx
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
+	xlsx := excelize.NewFile()
+	sheetName := "Sheet1"
 
+	// Set header row
 	header := []string{"ID", "Name", "Divisi", "Jabatan", "Email", "RoomType", "BookingDate", "BookingDateEnd", "Status", "Description"}
-	err = writer.Write(header)
-	if err != nil {
-		return nil, err
+	for colIndex, colName := range header {
+		cell := fmt.Sprintf("%c%d", 'A'+colIndex, 1)
+		xlsx.SetCellValue(sheetName, cell, colName)
 	}
 
-	for _, row := range bookings {
-		// Fetch details for each booking
+	// Write data rows
+	for rowIndex, row := range bookings {
 		bookingDetails, err := b.repo.GetBookingDetailsByBookingID(row.Id)
 		if err != nil {
 			return nil, err
@@ -66,13 +78,41 @@ func (b *bookingUseCase) DownloadReport() ([]model.Booking, error) {
 				v.Description,
 			}
 
-			if err := writer.Write(data); err != nil {
-				return nil, err
+			for colIndex, cellValue := range data {
+				cell := fmt.Sprintf("%c%d", 'A'+colIndex, rowIndex+2) // Add 2 to rowIndex to skip header row
+				xlsx.SetCellValue(sheetName, cell, cellValue)
 			}
 		}
 	}
 
+	// Save the xlsx file
+	err = xlsx.SaveAs("Report.xlsx")
+	if err != nil {
+		return nil, err
+	}
+
 	return bookings, nil
+}
+
+func (b *bookingUseCase) SendReport(requestJSON string) ([]model.Booking, error) {
+	var emailRecipients EmailRecipient
+	err := json.Unmarshal([]byte(requestJSON), &emailRecipients)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing email JSON: %v", err)
+	}
+
+	err = b.emailService.SendEmailFile(modelutil.BodySender{
+		To:          []string{emailRecipients.To},
+		Subject:     "Report",
+		Body:        "Booking Room Report",
+		CSVFilePath: "Report.xlsx",
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("error sending email: %v", err)
+	}
+
+	return nil, nil
 }
 
 // UpdateStatusBookAndRoom implements BookingUseCase.
@@ -183,10 +223,12 @@ func NewBookingUseCase(
 	repo repository.BookingRepository,
 	userUC UserUseCase,
 	roomUC RoomUseCase,
+	emailService common.EmailService,
 ) BookingUseCase {
 	return &bookingUseCase{
-		repo:   repo,
-		userUC: userUC,
-		roomUC: roomUC,
+		repo:         repo,
+		userUC:       userUC,
+		roomUC:       roomUC,
+		emailService: emailService,
 	}
 }

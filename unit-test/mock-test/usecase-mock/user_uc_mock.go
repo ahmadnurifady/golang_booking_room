@@ -55,3 +55,10 @@ func (m *EmailServiceMock) SendEmail(payload modelutil.BodySender) error {
 	}
 	return nil
 }
+
+func (m *EmailServiceMock) SendEmailFile(payload modelutil.BodySender) error {
+	if m.SendEmailFunc != nil {
+		return m.SendEmailFunc(payload)
+	}
+	return nil
+}
