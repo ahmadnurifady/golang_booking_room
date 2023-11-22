@@ -1,9 +1,9 @@
 package common
 
 import (
+	"final-project/config"
+	"final-project/utils/modelutil"
 	"os"
-	"project-final/config"
-	"project-final/utils/modelutil"
 
 	"github.com/sirupsen/logrus"
 )

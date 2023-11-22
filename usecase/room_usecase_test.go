@@ -1,9 +1,9 @@
 package usecase
 
 import (
+	"final-project/model"
+	repositorymock "final-project/unit-test/mock-test/repository-mock"
 	"fmt"
-	"project-final/model"
-	repositorymock "project-final/unit-test/mock-test/repository-mock"
 
 	"testing"
 	"time"

@@ -1,6 +1,6 @@
 package main
 
-import "project-final/delivery"
+import "final-project/delivery"
 
 func main() {
 	delivery.NewServer().Run()

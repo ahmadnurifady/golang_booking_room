@@ -1,7 +1,7 @@
 package repositorymock
 
 import (
-	"project-final/model"
+	"final-project/model"
 
 	"github.com/stretchr/testify/mock"
 )
@@ -45,7 +45,7 @@ func (b *BookingRepoMock) GetBookingDetailsByBookingID(bookingID string) ([]mode
 	return args.Get(0).([]model.BookingDetail), args.Error(1)
 }
 
-func (b *BookingRepoMock) GetReport() ([]model.Booking, error) {
-	args := b.Called()
+func (b *BookingRepoMock) GetReport(requestJSON string) ([]model.Booking, error) {
+	args := b.Called(requestJSON)
 	return args.Get(0).([]model.Booking), args.Error(1)
 }

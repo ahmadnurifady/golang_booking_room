@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"project-final/model"
+	"final-project/model"
 	"testing"
 	"time"
 

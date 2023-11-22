@@ -6,6 +6,7 @@ const (
 	RoleSesion = "roleUser"
 
 	DownloadReport = "/download"
+	SendReport     = "/send"
 	UserAdmin      = "510068c3-8172-48ce-8d5b-ecb3de591b51"
 
 	AuthGroup        = "/auth"
@@ -19,7 +20,7 @@ const (
 	UserGet    = "/:id"
 	UserDelete = "/:id"
 	UserGetAll = "/"
-	UserUpdate = "/:id"
+	UserUpdate = "/"
 
 	//booking
 	BookingGroup          = "/booking"

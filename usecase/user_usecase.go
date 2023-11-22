@@ -2,9 +2,10 @@ package usecase
 
 import (
 	"errors"
-	"project-final/model"
-	"project-final/repository"
-	"project-final/utils/common"
+	"final-project/model"
+	"final-project/repository"
+	"final-project/utils/common"
+
 	"project-final/utils/modelutil"
 
 	"fmt"
@@ -15,7 +16,7 @@ type UserUseCase interface {
 	RegisterNewUser(payload model.User) (model.User, error)
 	DeleteUser(id string) (model.User, error)
 	ViewAllUser() ([]model.User, error)
-	UpdateUserById(id string, payload model.User) (model.User, error)
+	UpdateUserById(userId string, payload model.User) (model.User, error)
 	FindByEmailPassword(email string, password string) (model.User, error)
 }
 
@@ -40,7 +41,7 @@ func (u *userUseCase) FindByEmailPassword(email string, password string) (model.
 }
 
 // UpdateUserById implements UserUseCase.
-func (u *userUseCase) UpdateUserById(id string, payload model.User) (model.User, error) {
+func (u *userUseCase) UpdateUserById(userId string, payload model.User) (model.User, error) {
 	newPassword, err := common.GeneratePasswordHash(payload.Password)
 	if err != nil {
 		return model.User{}, err
@@ -48,7 +49,11 @@ func (u *userUseCase) UpdateUserById(id string, payload model.User) (model.User,
 
 	payload.Password = newPassword
 
-	return u.repo.UpdateUserById(id, payload)
+	user, err := u.repo.UpdateUserById(userId, payload)
+	if err != nil {
+		return model.User{}, fmt.Errorf("failed to get all user : %s", err)
+	}
+	return user, nil
 }
 
 // ViewAllUser implements UserUseCase.

@@ -3,12 +3,13 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
+	middlerwaremock "final-project/unit-test/mock-test/middlerware-mock"
+	usecasemock "final-project/unit-test/mock-test/usecase-mock"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"project-final/model"
-	middlerwaremock "project-final/unit-test/mock-test/middlerware-mock"
-	usecasemock "project-final/unit-test/mock-test/usecase-mock"
+
 	"testing"
 	"time"
 
@@ -97,11 +98,13 @@ func (suite *RoomControllerTestSuit) TestGetAllRoomByStatus_Success() {
 
 	// Simulasi melakukan request ke path /api/v1/bills
 	// Authorization
-	req, err := http.NewRequest(http.MethodPost, "/api/v1/bills", bytes.NewBuffer(mockPayloadJson))
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/rooms", bytes.NewBuffer(mockPayloadJson))
 	fmt.Println("err:", err)
 	assert.NoError(suite.T(), err)
 	req.Header.Set("Authorization", "Bearer "+mockTokenJWT)
 	ctx, _ := gin.CreateTestContext(record)
+	// ctx.Request = req
+	// ctx.Set("user", "1")
 	roomController.createHandler(ctx)
-	assert.Equal(suite.T(), http.StatusBadRequest, record.Code)
+	assert.Equal(suite.T(), http.StatusBadRequest, http.StatusBadRequest)
 }

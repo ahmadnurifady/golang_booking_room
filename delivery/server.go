@@ -4,14 +4,14 @@ import (
 
 	// "final-project/delivery/middleware"
 
+	"final-project/config"
+	"final-project/delivery/controller"
+	"final-project/delivery/middleware"
+	"final-project/manager"
+	"final-project/usecase"
+	"final-project/utils/common"
 	"fmt"
 	"log"
-	"project-final/config"
-	"project-final/delivery/controller"
-	"project-final/delivery/middleware"
-	"project-final/manager"
-	"project-final/usecase"
-	"project-final/utils/common"
 
 	"github.com/gin-gonic/gin"
 )

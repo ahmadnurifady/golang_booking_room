@@ -2,8 +2,8 @@ package repository
 
 import (
 	"database/sql"
+	"final-project/model"
 	"fmt"
-	"project-final/model"
 	"time"
 )
 

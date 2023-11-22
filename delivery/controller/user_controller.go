@@ -1,12 +1,12 @@
 package controller
 
 import (
+	"final-project/config"
+	"final-project/delivery/middleware"
+	"final-project/model"
+	"final-project/usecase"
+	"final-project/utils/common"
 	"net/http"
-	"project-final/config"
-	"project-final/delivery/middleware"
-	"project-final/model"
-	"project-final/usecase"
-	"project-final/utils/common"
 
 	"github.com/gin-gonic/gin"
 )
@@ -45,20 +45,19 @@ func (u *UserController) createHandler(ctx *gin.Context) {
 }
 
 func (u *UserController) UpdateUserHandler(ctx *gin.Context) {
-	id := ctx.Param("id")
-	if id == "" {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
-		return
-	}
+	// id := ctx.Param("id")
+	// if id == "" {
+	// 	common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
+	// 	return
+	// }
 
 	var payload model.User
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
-	payload.Id = id
-
-	rspPayload, err := u.uc.UpdateUserById(payload.Id, payload)
+	userId := ctx.MustGet(config.UserSesion).(string)
+	rspPayload, err := u.uc.UpdateUserById(userId, payload)
 	if err != nil {
 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return

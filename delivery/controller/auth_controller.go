@@ -1,12 +1,13 @@
 package controller
 
 import (
+	"final-project/config"
+	"final-project/model"
+	"final-project/model/dto"
+	"final-project/usecase"
+	"final-project/utils/common"
 	"net/http"
-	"project-final/config"
-	"project-final/model"
-	"project-final/model/dto"
-	"project-final/usecase"
-	"project-final/utils/common"
+
 	"strings"
 
 	"github.com/gin-gonic/gin"

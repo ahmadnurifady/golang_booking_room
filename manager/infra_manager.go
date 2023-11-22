@@ -2,8 +2,8 @@ package manager
 
 import (
 	"database/sql"
+	"final-project/config"
 	"fmt"
-	"project-final/config"
 
 	_ "github.com/lib/pq"
 )

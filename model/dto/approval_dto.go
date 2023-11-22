@@ -1,6 +1,6 @@
 package dto
 
 type Approval struct {
-	Approval        string `json:"approval"`
-	BookingDetailId string `json:"bookingDetailId"`
+	Approval        string `json:"approval" binding:"required"`
+	BookingDetailId string `json:"bookingDetailId" binding:"required"`
 }

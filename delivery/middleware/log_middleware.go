@@ -1,9 +1,10 @@
 package middleware
 
 import (
+	"final-project/utils/common"
+	"final-project/utils/modelutil"
 	"log"
-	"project-final/utils/common"
-	"project-final/utils/modelutil"
+
 	"time"
 
 	"github.com/gin-gonic/gin"

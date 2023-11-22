@@ -4,12 +4,12 @@ import "time"
 
 type User struct {
 	Id        string    `json:"id"`
-	Name      string    `json:"name"`
-	Divisi    string    `json:"divisi"`
-	Jabatan   string    `json:"jabatan"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password,omitempty"`
-	Role      string    `json:"role"`
+	Name      string    `json:"name" binding:"required"`
+	Divisi    string    `json:"divisi" binding:"required"`
+	Jabatan   string    `json:"jabatan" binding:"required"`
+	Email     string    `json:"email" binding:"required"`
+	Password  string    `json:"password,omitempty" binding:"required"`
+	Role      string    `json:"role" binding:"required"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }

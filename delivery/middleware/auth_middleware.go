@@ -1,9 +1,10 @@
 package middleware
 
 import (
+	"final-project/config"
+	"final-project/utils/common"
 	"net/http"
-	"project-final/config"
-	"project-final/utils/common"
+
 	"strings"
 
 	"github.com/gin-gonic/gin"

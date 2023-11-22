@@ -1,9 +1,10 @@
 package usecase
 
 import (
+	"final-project/model"
+	"final-project/repository"
 	"fmt"
-	"project-final/model"
-	"project-final/repository"
+
 	"strings"
 )
 

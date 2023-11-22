@@ -1,7 +1,7 @@
 package repositorymock
 
 import (
-	"project-final/model"
+	"final-project/model"
 
 	"github.com/stretchr/testify/mock"
 )
@@ -25,11 +25,6 @@ func (r *RoomRepositoryMock) Get(id string) (model.Room, error) {
 	args := r.Called(id)
 	return args.Get(0).(model.Room), args.Error(1)
 }
-
-// func (r *RoomRepositoryMock) GetByTypeRoom(roomType string) (model.Room, error) {
-// 	args := r.Called(roomType)
-// 	return args.Get(0).(model.Room), args.Error(1)
-// }
 
 func (r *RoomRepositoryMock) GetAllRoom() ([]model.Room, error) {
 	args := r.Called()

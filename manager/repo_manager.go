@@ -1,6 +1,6 @@
 package manager
 
-import "project-final/repository"
+import "final-project/repository"
 
 type RepoManager interface {
 	UserRepo() repository.UserRepository
