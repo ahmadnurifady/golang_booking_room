@@ -3,12 +3,12 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
+	"final-project/model"
 	middlerwaremock "final-project/unit-test/mock-test/middlerware-mock"
 	usecasemock "final-project/unit-test/mock-test/usecase-mock"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"project-final/model"
 
 	"testing"
 	"time"
