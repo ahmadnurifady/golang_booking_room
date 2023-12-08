@@ -6,8 +6,7 @@ import (
 	"final-project/model/dto"
 	"final-project/repository"
 	"final-project/utils/common"
-	"os"
-	"project-final/utils/modelutil"
+	"final-project/utils/modelutil"
 
 	"fmt"
 )
@@ -18,7 +17,7 @@ type BookingUseCase interface {
 	ViewAllBooking() ([]model.Booking, error)
 	ViewAllBookingByStatus(status string) ([]model.Booking, error)
 	UpdateStatusBookAndRoom(id string, approval string) (model.Booking, error)
-	DownloadReport() ([]model.Booking, error)
+	// DownloadReport() ([]model.Booking, error)
 	SendReport(requestJSON string) ([]model.Booking, error)
 }
 
@@ -33,64 +32,64 @@ type bookingUseCase struct {
 	emailService common.EmailService
 }
 
-func (b *bookingUseCase) DownloadReport() ([]model.Booking, error) {
-	bookings, err := b.repo.GetAll()
-	if err != nil {
-		return nil, err
-	}
+// func (b *bookingUseCase) DownloadReport() ([]model.Booking, error) {
+// 	bookings, err := b.repo.GetAll()
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	file, err := os.Create("Report.xlsx")
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
+// 	file, err := os.Create("Report.xlsx")
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer file.Close()
 
-	xlsx := excelize.NewFile()
-	sheetName := "Sheet1"
+// 	// xlsx := excelize.NewFile()
+// 	sheetName := "Sheet1"
 
-	// Set header row
-	header := []string{"ID", "Name", "Divisi", "Jabatan", "Email", "RoomType", "BookingDate", "BookingDateEnd", "Status", "Description"}
-	for colIndex, colName := range header {
-		cell := fmt.Sprintf("%c%d", 'A'+colIndex, 1)
-		xlsx.SetCellValue(sheetName, cell, colName)
-	}
+// 	// Set header row
+// 	header := []string{"ID", "Name", "Divisi", "Jabatan", "Email", "RoomType", "BookingDate", "BookingDateEnd", "Status", "Description"}
+// 	for colIndex, colName := range header {
+// 		cell := fmt.Sprintf("%c%d", 'A'+colIndex, 1)
+// 		// xlsx.SetCellValue(sheetName, cell, colName)
+// 	}
 
-	// Write data rows
-	for rowIndex, row := range bookings {
-		bookingDetails, err := b.repo.GetBookingDetailsByBookingID(row.Id)
-		if err != nil {
-			return nil, err
-		}
+// 	// Write data rows
+// 	for rowIndex, row := range bookings {
+// 		bookingDetails, err := b.repo.GetBookingDetailsByBookingID(row.Id)
+// 		if err != nil {
+// 			return nil, err
+// 		}
 
-		for _, v := range bookingDetails {
-			data := []string{
-				row.Id,
-				row.Users.Name,
-				row.Users.Divisi,
-				row.Users.Jabatan,
-				row.Users.Email,
-				v.Rooms.RoomType,
-				v.BookingDate.Format("2006-01-02"),
-				v.BookingDateEnd.Format("2006-01-02"),
-				v.Rooms.Status,
-				v.Description,
-			}
+// 		for _, v := range bookingDetails {
+// 			data := []string{
+// 				row.Id,
+// 				row.Users.Name,
+// 				row.Users.Divisi,
+// 				row.Users.Jabatan,
+// 				row.Users.Email,
+// 				v.Rooms.RoomType,
+// 				v.BookingDate.Format("2006-01-02"),
+// 				v.BookingDateEnd.Format("2006-01-02"),
+// 				v.Rooms.Status,
+// 				v.Description,
+// 			}
 
-			for colIndex, cellValue := range data {
-				cell := fmt.Sprintf("%c%d", 'A'+colIndex, rowIndex+2)
-				xlsx.SetCellValue(sheetName, cell, cellValue)
-			}
-		}
-	}
+// 			for colIndex, cellValue := range data {
+// 				cell := fmt.Sprintf("%c%d", 'A'+colIndex, rowIndex+2)
+// 				xlsx.SetCellValue(sheetName, cell, cellValue)
+// 			}
+// 		}
+// 	}
 
-	// Save the xlsx file
-	err = xlsx.SaveAs("Report.xlsx")
-	if err != nil {
-		return nil, err
-	}
+// 	// Save the xlsx file
+// 	err = xlsx.SaveAs("Report.xlsx")
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return bookings, nil
-}
+// 	return bookings, nil
+// }
 
 func (b *bookingUseCase) SendReport(requestJSON string) ([]model.Booking, error) {
 	var emailRecipients EmailRecipient

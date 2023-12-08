@@ -28,7 +28,7 @@ func (j *jwtToken) GenerateToken(payload model.User) (dto.AuthResponseDto, error
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    j.cfg.IssuerName,
 			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(j.cfg.JwtLifeTime)),
+			ExpiresAt: nil,
 		},
 		UserId: payload.Id,
 		Role:   payload.Role,

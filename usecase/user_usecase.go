@@ -5,8 +5,7 @@ import (
 	"final-project/model"
 	"final-project/repository"
 	"final-project/utils/common"
-
-	"project-final/utils/modelutil"
+	"final-project/utils/modelutil"
 
 	"fmt"
 )
@@ -32,7 +31,7 @@ func (u *userUseCase) FindByEmailPassword(email string, password string) (model.
 	}
 
 	if err := common.ComparePasswordHash(user.Password, password); err != nil {
-		return model.User{}, fmt.Errorf("compare password %s ", err)
+		return model.User{}, fmt.Errorf("password is wrong")
 	}
 
 	user.Password = ""

@@ -120,15 +120,15 @@ func (b *BookingController) sendReportHandler(ctx *gin.Context) {
 	common.SendSingleResponse(ctx, "Ok", rspPayload)
 }
 
-func (b *BookingController) getReportHandler(ctx *gin.Context) {
-	rspPayload, err := b.uc.DownloadReport()
-	if err != nil {
-		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
-		return
-	}
+// func (b *BookingController) getReportHandler(ctx *gin.Context) {
+// 	rspPayload, err := b.uc.DownloadReport()
+// 	if err != nil {
+// 		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+// 		return
+// 	}
 
-	common.SendSingleResponse(ctx, "Ok", rspPayload)
-}
+// 	common.SendSingleResponse(ctx, "Ok", rspPayload)
+// }
 
 func (b *BookingController) Route() {
 	bc := b.rg.Group(config.BookingGroup)
@@ -137,7 +137,7 @@ func (b *BookingController) Route() {
 	bc.GET(config.BookingGetAll, b.authMiddleware.RequireToken("admin", "GA"), b.getAllHandler)
 	bc.GET(config.BookingGet, b.authMiddleware.RequireToken("admin", "employee", "GA"), b.getHandler)
 	bc.GET(config.BookingGetAllByStatus, b.authMiddleware.RequireToken("admin", "GA"), b.getByStatusHandler)
-	bc.GET(config.DownloadReport, b.authMiddleware.RequireToken("admin", "GA"), b.getReportHandler)
+	// bc.GET(config.DownloadReport, b.authMiddleware.RequireToken("admin", "GA"), b.getReportHandler)
 	bc.GET(config.SendReport, b.authMiddleware.RequireToken("admin", "GA"), b.sendReportHandler)
 
 }

@@ -12,7 +12,9 @@ import (
 	"final-project/utils/common"
 	"fmt"
 	"log"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,9 +29,26 @@ type Server struct {
 }
 
 func (s *Server) setupControllers() {
+	s.engine.Use(cors.New(cors.Config{
+		AllowAllOrigins:  true,
+		AllowMethods:     []string{"POST", "DELETE", "GET", "OPTIONS", "PUT"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           720 * time.Hour,
+	}))
 	s.engine.Use(middleware.NewLogMiddleware(s.logService).LogRequest())
 	authMiddlerware := middleware.NewAuthMiddleware(s.jwtService)
 	rg := s.engine.Group("/api/v1")
+
+	// rg.Use(cors.New(cors.Config{
+	// 	AllowAllOrigins:  true,
+	// 	AllowMethods:     []string{"POST", "DELETE", "GET", "OPTIONS", "PUT"},
+	// 	AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+	// 	ExposeHeaders:    []string{"Content-Length"},
+	// 	AllowCredentials: true,
+	// 	MaxAge:           720 * time.Hour,
+	// }))
 	controller.NewUserController(s.uc.UserUseCase(), rg, authMiddlerware).Route()
 	controller.NewBookingController(s.uc.BookingUsecase(), rg, authMiddlerware).Route()
 	controller.NewAuthController(s.auth, rg, s.jwtService).Route()

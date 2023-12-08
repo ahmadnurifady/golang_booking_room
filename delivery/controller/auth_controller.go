@@ -44,7 +44,7 @@ func (a *AuthController) loginHandler(ctx *gin.Context) {
 
 	rspPayload, err := a.uc.Login(payload)
 	if err != nil {
-		common.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		common.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 

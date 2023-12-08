@@ -1,7 +1,7 @@
 package usecasemock
 
 import (
-	"project-final/model"
+	"final-project/model"
 
 	"github.com/stretchr/testify/mock"
 )
