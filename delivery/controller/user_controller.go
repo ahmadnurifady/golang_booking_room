@@ -45,11 +45,6 @@ func (u *UserController) createHandler(ctx *gin.Context) {
 }
 
 func (u *UserController) UpdateUserHandler(ctx *gin.Context) {
-	// id := ctx.Param("id")
-	// if id == "" {
-	// 	common.SendErrorResponse(ctx, http.StatusBadRequest, "id can't be empty")
-	// 	return
-	// }
 
 	var payload model.User
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
@@ -100,7 +95,7 @@ func (u *UserController) DeleteByIdHandler(ctx *gin.Context) {
 
 func (u *UserController) Route() {
 	ur := u.rg.Group(config.UserGroup)
-	ur.POST(config.UserPost, u.authMiddleware.RequireToken("admin"), u.createHandler)
+	ur.POST(config.UserPost, u.createHandler)
 	ur.PUT(config.UserUpdate, u.authMiddleware.RequireToken("admin", "employee"), u.UpdateUserHandler)
 	ur.GET(config.UserGet, u.authMiddleware.RequireToken("admin"), u.getByIdHandler)
 	ur.DELETE(config.UserDelete, u.authMiddleware.RequireToken("admin"), u.DeleteByIdHandler)

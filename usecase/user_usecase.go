@@ -5,7 +5,6 @@ import (
 	"final-project/model"
 	"final-project/repository"
 	"final-project/utils/common"
-	"final-project/utils/modelutil"
 
 	"fmt"
 )
@@ -87,8 +86,6 @@ func (u *userUseCase) RegisterNewUser(payload model.User) (model.User, error) {
 
 	if payload.IsEmpty() {
 		return model.User{}, errors.New("all fields must be filled in")
-
-		// return model.User{}, errors.New("invalid role, role must admin or employee")
 	}
 
 	newPassword, err := common.GeneratePasswordHash(payload.Password)
@@ -96,17 +93,17 @@ func (u *userUseCase) RegisterNewUser(payload model.User) (model.User, error) {
 		return model.User{}, err
 	}
 
-	if payload.Email != "" && payload.Password != "" {
-		bodySender := modelutil.BodySender{
-			To:      []string{payload.Email},
-			Subject: "Registrasi Akun",
-			Body:    "Selamat ! Akun anda telah terdaftar. sekarang anda dapat melakukan Booking Room",
-		}
-		err := u.emailService.SendEmail(bodySender)
-		if err != nil {
-			return model.User{}, err
-		}
-	}
+	// if payload.Email != "" && payload.Password != "" {
+	// 	bodySender := modelutil.BodySender{
+	// 		To:      []string{payload.Email},
+	// 		Subject: "Registrasi Akun",
+	// 		Body:    "Selamat ! Akun anda telah terdaftar. sekarang anda dapat melakukan Booking Room",
+	// 	}
+	// 	err := u.emailService.SendEmail(bodySender)
+	// 	if err != nil {
+	// 		return model.User{}, err
+	// 	}
+	// }
 
 	payload.Password = newPassword
 	return u.repo.Create(payload)

@@ -153,25 +153,22 @@ func (r *RoomController) updateHandler(ctx *gin.Context) {
 func (r *RoomController) Route() {
 	br := r.rg.Group(config.RoomGroup)
 
-	br.POST(config.RoomPost, r.authMiddleware.RequireToken("admin"), r.createHandler) //ADMIN
+	br.POST(config.RoomPost, r.authMiddleware.RequireToken("admin"), r.createHandler)
 
 	br.GET(config.RoomGetByroomType, r.authMiddleware.RequireToken("admin", "GA"), r.getByRoomtypeHandler)
-	//ADMIN GA
 
-	br.GET(config.RoomGetAll, r.authMiddleware.RequireToken("admin", "GA"), r.getAllRoom) //admin GA
+	br.GET(config.RoomGetAll, r.authMiddleware.RequireToken("admin", "GA"), r.getAllRoom)
 
-	br.GET(config.RoomGetById, r.authMiddleware.RequireToken("admin", "GA"), r.getHandler) //ADMIN GA
+	br.GET(config.RoomGetById, r.authMiddleware.RequireToken("admin", "GA"), r.getHandler)
 
-	br.DELETE(config.RoomDelete, r.authMiddleware.RequireToken("admin"), r.deleteHandler) //ADMIN
+	br.DELETE(config.RoomDelete, r.authMiddleware.RequireToken("admin"), r.deleteHandler)
 
-	br.PUT(config.RoomUpdate, r.authMiddleware.RequireToken("admin", "GA"), r.updateHandler) //ADMIN GA
+	br.PUT(config.RoomUpdate, r.authMiddleware.RequireToken("admin", "GA"), r.updateHandler)
 
-	br.PUT(config.RoomUpdateStatus, r.authMiddleware.RequireToken("GA"), r.changeStatusHandler)
-	//GA
+	br.PUT(config.RoomUpdateStatus, r.authMiddleware.RequireToken("GA", "admin"), r.changeStatusHandler)
 
-	br.GET(config.RoomGetByStatus, r.authMiddleware.RequireToken("employee"), r.getAllRoomByStatus)
+	br.GET(config.RoomGetByStatus, r.authMiddleware.RequireToken("employee", "admin"), r.getAllRoomByStatus)
 
-	//ChangeRoomStatus(id string) //USER
 }
 
 func NewRoomController(uc usecase.RoomUseCase, rg *gin.RouterGroup, authmiddleware middleware.AuthMiddleware) *RoomController {
