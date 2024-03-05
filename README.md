@@ -60,6 +60,7 @@ Request :
 - Header :
   - Accept : application/json
   - Authorization : bearer-token
+  - Authorization : bearer-token
 
 Response :
 
@@ -89,6 +90,7 @@ Request :
 - Header :
   - Content-Type : application/json
   - Accept : application/json
+  - Authorization : bearer-token
   - Authorization : bearer-token
 - Body :
 
@@ -128,8 +130,10 @@ Request :
 
 - Method : `DELETE`
 - Endpoint : `/users/:id`
+- Endpoint : `/users/:id`
 - Header :
   - Accept : application/json
+  - Authorization : bearer-token
   - Authorization : bearer-token
 - Body :
 
@@ -153,6 +157,7 @@ Request :
 - Endpoint : `/api/v1/users`
 - Header :
   - Accept : application/json
+  - Authorization : bearer-token
   - Authorization : bearer-token
 - Body :
 
@@ -547,6 +552,7 @@ Request :
       "description": "ini desciption",
       "rooms": {
         "id": "String"
+        "id": "String"
       }
     }
   ]
@@ -566,7 +572,14 @@ Response :
   },
   "data": {
     "bookingId": "String",
+    "bookingId": "String",
     "employe": {
+      "id": "String",
+      "name": "String",
+      "divisi": "String",
+      "jabatan": "String",
+      "email": "String",
+      "role": "String",
       "id": "String",
       "name": "String",
       "divisi": "String",
@@ -578,7 +591,12 @@ Response :
       {
         "id": "String",
         "bookingId": "String",
+        "id": "String",
+        "bookingId": "String",
         "rooms": {
+          "id": "String",
+          "roomType": "String",
+          "maxcapacity": "Number",
           "id": "String",
           "roomType": "String",
           "maxcapacity": "Number",
@@ -597,9 +615,24 @@ Response :
             "ac": "String",
             "bathroom": "String",
             "coffeMaker": "String",
+            "id": "String",
+            "description": "String",
+            "wifi": "String",
+            "soundSystem": "String",
+            "projector": "String",
+            "screenProjector": "String",
+            "chairs": "String",
+            "tables": "String",
+            "soundProof": "String",
+            "smokingArea": "String",
+            "television": "String",
+            "ac": "String",
+            "bathroom": "String",
+            "coffeMaker": "String",
           },
           "status": "available",
         },
+        "description": "String",
         "description": "String",
         "status": "pending",
         "bookingDate": "2023-11-21T08:45:00.954394Z",
@@ -626,6 +659,7 @@ Request :
 Response :
 
 
+
 - Status : 200 OK
 - Body :
 
@@ -633,11 +667,19 @@ Response :
 {
   "status": {
     "code": 201,
+    "code": 201,
     "description": "Ok"
   },
   "data": {
     "bookingId": "String",
+    "bookingId": "String",
     "employe": {
+      "id": "String",
+      "name": "String",
+      "divisi": "String",
+      "jabatan": "String",
+      "email": "String",
+      "role": "String",
       "id": "String",
       "name": "String",
       "divisi": "String",
@@ -649,7 +691,12 @@ Response :
       {
         "id": "String",
         "bookingId": "String",
+        "id": "String",
+        "bookingId": "String",
         "rooms": {
+          "id": "String",
+          "roomType": "String",
+          "maxcapacity": "Number",
           "id": "String",
           "roomType": "String",
           "maxcapacity": "Number",
@@ -668,9 +715,24 @@ Response :
             "ac": "String",
             "bathroom": "String",
             "coffeMaker": "String",
+            "id": "String",
+            "description": "String",
+            "wifi": "String",
+            "soundSystem": "String",
+            "projector": "String",
+            "screenProjector": "String",
+            "chairs": "String",
+            "tables": "String",
+            "soundProof": "String",
+            "smokingArea": "String",
+            "television": "String",
+            "ac": "String",
+            "bathroom": "String",
+            "coffeMaker": "String",
           },
           "status": "available",
         },
+        "description": "String",
         "description": "String",
         "status": "pending",
         "bookingDate": "2023-11-21T08:45:00.954394Z",
@@ -759,11 +821,19 @@ Response :
 {
   "status": {
     "code": 201,
+    "code": 201,
     "description": "Ok"
   },
   "data": {
     "bookingId": "String",
+    "bookingId": "String",
     "employe": {
+      "id": "String",
+      "name": "String",
+      "divisi": "String",
+      "jabatan": "String",
+      "email": "String",
+      "role": "String",
       "id": "String",
       "name": "String",
       "divisi": "String",
@@ -775,7 +845,12 @@ Response :
       {
         "id": "String",
         "bookingId": "String",
+        "id": "String",
+        "bookingId": "String",
         "rooms": {
+          "id": "String",
+          "roomType": "String",
+          "maxcapacity": "Number",
           "id": "String",
           "roomType": "String",
           "maxcapacity": "Number",
@@ -794,9 +869,24 @@ Response :
             "ac": "String",
             "bathroom": "String",
             "coffeMaker": "String",
+            "id": "String",
+            "description": "String",
+            "wifi": "String",
+            "soundSystem": "String",
+            "projector": "String",
+            "screenProjector": "String",
+            "chairs": "String",
+            "tables": "String",
+            "soundProof": "String",
+            "smokingArea": "String",
+            "television": "String",
+            "ac": "String",
+            "bathroom": "String",
+            "coffeMaker": "String",
           },
           "status": "available",
         },
+        "description": "String",
         "description": "String",
         "status": "decline",
         "bookingDate": "2023-11-21T08:45:00.954394Z",
