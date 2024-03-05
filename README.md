@@ -15,7 +15,7 @@ Projek ini adalah Final Project Golang Batch 12, di projek ini kita membuat apli
 Request :
 
 - Method : `POST`
-- Endpoint : `/employees`
+- Endpoint : `/api/v1/users`
 - Header :
   - Content-Type : application/json
   - Accept : application/json
@@ -56,9 +56,10 @@ Response :
 Request :
 
 - Method : `GET`
-- Endpoint : `/employees/:id`
+- Endpoint : `/api/v1/users/:id`
 - Header :
   - Accept : application/json
+  - Authorization : bearer-token
 
 Response :
 
@@ -84,10 +85,11 @@ Response :
 Request :
 
 - Method : `PUT`
-- Endpoint : `/employees/:id`
+- Endpoint : `/api/v1/users/:id`
 - Header :
   - Content-Type : application/json
   - Accept : application/json
+  - Authorization : bearer-token
 - Body :
 
 ```json
@@ -125,9 +127,10 @@ Response :
 Request :
 
 - Method : `DELETE`
-- Endpoint : `/employees/:id`
+- Endpoint : `/users/:id`
 - Header :
   - Accept : application/json
+  - Authorization : bearer-token
 - Body :
 
 Response :
@@ -147,9 +150,10 @@ Response :
 Request :
 
 - Method : `GET`
-- Endpoint : `/employees`
+- Endpoint : `/api/v1/users`
 - Header :
   - Accept : application/json
+  - Authorization : bearer-token
 - Body :
 
 Response :
@@ -171,6 +175,358 @@ Response :
 }
 ```
 
+
+### ROOM
+
+### Create Room
+
+Request : 
+
+- Method : `POST`
+- Endpoint : `/api/v1/rooms/create`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+  - Authorization : bearer-token
+- Body :
+```json
+
+{
+    "id": "String",
+    "roomtype": "String",
+    "maxcapacity": "Number",
+    "facility": {
+        "description": "String",
+        "wifi": "String",
+        "projector": "String",
+        "screenProjector": "String",
+        "chairs": "String",
+        "tables": "String",
+        "soundProof": "String",
+        "smokingArea": "String",
+        "television": "String",
+        "ac": "String",
+        "bathroom": "String",
+        "coffeMaker": "String"
+    },
+    "status": "available"
+}
+```
+Response :
+
+```json
+{
+    "status": {
+        "code": 200,
+        "description": "Ok"
+    },
+    "data": {
+    "id": "String",
+    "roomtype": "String",
+    "maxcapacity": "Number",
+    "facility": {
+        "description": "String",
+        "wifi": "String",
+        "projector": "String",
+        "screenProjector": "String",
+        "chairs": "String",
+        "tables": "String",
+        "soundProof": "String",
+        "smokingArea": "String",
+        "television": "String",
+        "ac": "String",
+        "bathroom": "String",
+        "coffeMaker": "String"
+    },
+        
+        "status": "available",
+        "createdAt": "2023-11-15T14:15:08.960824Z",
+        "updatedAt": "2023-11-15T14:15:08.959496Z"
+    }
+}
+
+```
+
+### GetByRoomType Room
+
+Request : 
+
+- Method : `GET`
+- Endpoint : `/api/v1/rooms`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+  - Authorization : bearer-token
+- Params :
+  - Key : roomType
+- Body : -
+
+
+Response :
+
+```json
+{
+    "status": {
+        "code": 200,
+        "description": "Ok"
+    },
+    "data": {
+    "id": "String",
+    "roomtype": "String",
+    "maxcapacity": "Number",
+    "facility": {
+        "description": "String",
+        "wifi": "String",
+        "projector": "String",
+        "screenProjector": "String",
+        "chairs": "String",
+        "tables": "String",
+        "soundProof": "String",
+        "smokingArea": "String",
+        "television": "String",
+        "ac": "String",
+        "bathroom": "String",
+        "coffeMaker": "String"
+    },
+        
+        "status": "available",
+        "createdAt": "2023-11-15T14:15:08.960824Z",
+        "updatedAt": "2023-11-15T14:15:08.959496Z"
+    }
+}
+
+```
+
+### GetById Room
+
+Request : 
+
+- Method : `GET`
+- Endpoint : `/api/v1/rooms/:id`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+  - Authorization : bearer-token
+- Body : -
+
+
+Response :
+
+```json
+{
+    "status": {
+        "code": 200,
+        "description": "Ok"
+    },
+    "data": {
+    "id": "String",
+    "roomtype": "String",
+    "maxcapacity": "Number",
+    "facility": {
+        "description": "String",
+        "wifi": "String",
+        "projector": "String",
+        "screenProjector": "String",
+        "chairs": "String",
+        "tables": "String",
+        "soundProof": "String",
+        "smokingArea": "String",
+        "television": "String",
+        "ac": "String",
+        "bathroom": "String",
+        "coffeMaker": "String"
+    },
+        
+        "status": "available",
+        "createdAt": "2023-11-15T14:15:08.960824Z",
+        "updatedAt": "2023-11-15T14:15:08.959496Z"
+    }
+}
+
+```
+
+
+### Update Room
+
+Request : 
+
+- Method : `PUT`
+- Endpoint : `/api/v1/rooms/:id`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+  - Authorization : bearer-token
+- Body : 
+```json
+{
+    "status": {
+        "code": 200,
+        "description": "Ok"
+    },
+    "data": {
+    "id": "String",
+    "roomtype": "String",
+    "maxcapacity": "Number",
+    "facility": {
+        "description": "String",
+        "wifi": "String",
+        "projector": "String",
+        "screenProjector": "String",
+        "chairs": "String",
+        "tables": "String",
+        "soundProof": "String",
+        "smokingArea": "String",
+        "television": "String",
+        "ac": "String",
+        "bathroom": "String",
+        "coffeMaker": "String"
+    },
+        
+        "status": "available",
+        "createdAt": "2023-11-15T14:15:08.960824Z",
+        "updatedAt": "2023-11-15T14:15:08.959496Z"
+    }
+}
+
+```
+
+Response :
+
+```json
+{
+    "status": {
+        "code": 200,
+        "description": "Ok"
+    },
+    "data": {
+    "id": "String",
+    "roomtype": "String",
+    "maxcapacity": "Number",
+    "facility": {
+        "description": "String",
+        "wifi": "String",
+        "projector": "String",
+        "screenProjector": "String",
+        "chairs": "String",
+        "tables": "String",
+        "soundProof": "String",
+        "smokingArea": "String",
+        "television": "String",
+        "ac": "String",
+        "bathroom": "String",
+        "coffeMaker": "String"
+    },
+        
+        "status": "available",
+        "createdAt": "2023-11-15T14:15:08.960824Z",
+        "updatedAt": "2023-11-15T14:15:08.959496Z"
+    }
+}
+
+```
+
+### Delete Room
+
+Request : 
+
+- Method : `DEL`
+- Endpoint : `/api/v1/rooms/:id`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+  - Authorization : bearer-token
+- Body : -
+
+
+Response :
+```json
+{
+    "status": {
+        "code": 200,
+        "description": "ok"
+    },
+    "data": null
+}
+```
+
+
+### GetAll Room
+
+Request : 
+
+- Method : `GET`
+- Endpoint : `/api/v1/rooms/get`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+  - Authorization : bearer-token
+- Body : -
+
+
+Response :
+
+```json
+{
+    "status": {
+        "code": 200,
+        "description": "Ok"
+    },
+    "data": []
+}
+
+```
+
+
+### GetByStatus Room
+
+Request : 
+
+- Method : `GET`
+- Endpoint : `/api/v1/rooms/status`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+  - Authorization : bearer-token
+- Params :
+  - Key : status
+- Body : -
+
+
+Response :
+
+```json
+{
+    "status": {
+        "code": 200,
+        "description": "Ok"
+    },
+    "data": {
+    "id": "String",
+    "roomtype": "String",
+    "maxcapacity": "Number",
+    "facility": {
+        "description": "String",
+        "wifi": "String",
+        "projector": "String",
+        "screenProjector": "String",
+        "chairs": "String",
+        "tables": "String",
+        "soundProof": "String",
+        "smokingArea": "String",
+        "television": "String",
+        "ac": "String",
+        "bathroom": "String",
+        "coffeMaker": "String"
+    },
+        
+        "status": "available",
+        "createdAt": "2023-11-15T14:15:08.960824Z",
+        "updatedAt": "2023-11-15T14:15:08.959496Z"
+    }
+}
+
+```
+
 ### Booking
 
 #### Create Booking
@@ -178,7 +534,7 @@ Response :
 Request :
 
 - Method : `POST`
-- Endpoint : `/booking`
+- Endpoint : `/api/v1/booking`
 - Header :
   - Content-Type : application/json
   - Accept : application/json
@@ -190,7 +546,7 @@ Request :
     {
       "description": "ini desciption",
       "rooms": {
-        "id": "92681558-650e-44fa-95ce-7ee92e7220b8"
+        "id": "String"
       }
     }
   ]
@@ -209,48 +565,42 @@ Response :
     "description": "Ok"
   },
   "data": {
-    "bookingId": "bdcaecf0-6ff5-4f9f-9225-49de1d584212",
+    "bookingId": "String",
     "employe": {
-      "id": "8f568c4a-95b4-46ec-ba29-de66b2e84f86",
-      "name": "ricky",
-      "divisi": "enigma",
-      "jabatan": "karyawan",
-      "email": "ricky@mail.com",
-      "role": "GA",
-      "createdAt": "2023-11-15T11:32:48.532463Z",
-      "updatedAt": "2023-11-15T11:32:48.466881Z"
+      "id": "String",
+      "name": "String",
+      "divisi": "String",
+      "jabatan": "String",
+      "email": "String",
+      "role": "String",
     },
     "bookingDetails": [
       {
-        "id": "0dd409b8-f8c2-402a-9133-7dcae0c7cada",
-        "bookingId": "bdcaecf0-6ff5-4f9f-9225-49de1d584212",
+        "id": "String",
+        "bookingId": "String",
         "rooms": {
-          "id": "92681558-650e-44fa-95ce-7ee92e7220b8",
-          "roomType": "kolam_renang",
-          "maxcapacity": 12,
+          "id": "String",
+          "roomType": "String",
+          "maxcapacity": "Number",
           "facility": {
-            "id": "83cca32f-45da-41ac-a35d-31e53c6952bd",
-            "description": "anjay",
-            "wifi": "ada tapi indihumu",
-            "soundSystem": "salon adanya",
-            "projector": "ada",
-            "screenProjector": "green screen",
-            "chairs": "ada",
-            "tables": "ada",
-            "soundProof": "ada",
-            "smokingArea": "ada",
-            "television": "ada",
-            "ac": "ac alam",
-            "bathroom": "JEDING KEBON",
-            "coffeMaker": "ada",
-            "createdAt": "2023-11-15T11:50:15.314491Z",
-            "updatedAt": "2023-11-15T11:50:15.156612Z"
+            "id": "String",
+            "description": "String",
+            "wifi": "String",
+            "soundSystem": "String",
+            "projector": "String",
+            "screenProjector": "String",
+            "chairs": "String",
+            "tables": "String",
+            "soundProof": "String",
+            "smokingArea": "String",
+            "television": "String",
+            "ac": "String",
+            "bathroom": "String",
+            "coffeMaker": "String",
           },
           "status": "available",
-          "createdAt": "2023-11-15T11:50:15.326955Z",
-          "updatedAt": "2023-11-15T11:50:15.326477Z"
         },
-        "description": "ini desciption",
+        "description": "String",
         "status": "pending",
         "bookingDate": "2023-11-21T08:45:00.954394Z",
         "bookingDateEnd": "2023-11-21T11:45:00.954394Z",
@@ -269,11 +619,12 @@ Response :
 Request :
 
 - Method : `GET`
-- Endpoint : `/booking/:id`
+- Endpoint : `/api/v1/booking/:id`
 - Header :
   - Accept : application/json
 
 Response :
+
 
 - Status : 200 OK
 - Body :
@@ -281,52 +632,46 @@ Response :
 ```json
 {
   "status": {
-    "code": 200,
+    "code": 201,
     "description": "Ok"
   },
   "data": {
-    "bookingId": "bdcaecf0-6ff5-4f9f-9225-49de1d584212",
+    "bookingId": "String",
     "employe": {
-      "id": "8f568c4a-95b4-46ec-ba29-de66b2e84f86",
-      "name": "ricky",
-      "divisi": "enigma",
-      "jabatan": "karyawan",
-      "email": "ricky@mail.com",
-      "role": "GA",
-      "createdAt": "2023-11-15T11:32:48.532463Z",
-      "updatedAt": "2023-11-15T11:32:48.466881Z"
+      "id": "String",
+      "name": "String",
+      "divisi": "String",
+      "jabatan": "String",
+      "email": "String",
+      "role": "String",
     },
     "bookingDetails": [
       {
-        "id": "0dd409b8-f8c2-402a-9133-7dcae0c7cada",
-        "bookingId": "",
+        "id": "String",
+        "bookingId": "String",
         "rooms": {
-          "id": "92681558-650e-44fa-95ce-7ee92e7220b8",
-          "roomType": "kolam_renang",
-          "maxcapacity": 12,
+          "id": "String",
+          "roomType": "String",
+          "maxcapacity": "Number",
           "facility": {
-            "id": "83cca32f-45da-41ac-a35d-31e53c6952bd",
-            "description": "anjay",
-            "wifi": "ada tapi indihumu",
-            "soundSystem": "salon adanya",
-            "projector": "ada",
-            "screenProjector": "",
-            "chairs": "ada",
-            "tables": "ada",
-            "soundProof": "ada",
-            "smokingArea": "ada",
-            "television": "ada",
-            "ac": "ac alam",
-            "bathroom": "JEDING KEBON",
-            "coffeMaker": "ada",
-            "createdAt": "2023-11-15T11:50:15.156612Z",
-            "updatedAt": "2023-11-15T11:50:15.314491Z"
+            "id": "String",
+            "description": "String",
+            "wifi": "String",
+            "soundSystem": "String",
+            "projector": "String",
+            "screenProjector": "String",
+            "chairs": "String",
+            "tables": "String",
+            "soundProof": "String",
+            "smokingArea": "String",
+            "television": "String",
+            "ac": "String",
+            "bathroom": "String",
+            "coffeMaker": "String",
           },
           "status": "available",
-          "createdAt": "2023-11-15T11:50:15.326955Z",
-          "updatedAt": "2023-11-15T11:50:15.326477Z"
         },
-        "description": "ini desciption",
+        "description": "String",
         "status": "pending",
         "bookingDate": "2023-11-21T08:45:00.954394Z",
         "bookingDateEnd": "2023-11-21T11:45:00.954394Z",
@@ -345,7 +690,7 @@ Response :
 Request :
 
 - Method : `GET`
-- Endpoint : `/booking`
+- Endpoint : `/api/v1/booking`
 - Header :
   - Accept : application/json
 - Body :
@@ -369,7 +714,7 @@ Response :
 Request :
 
 - Method : `GET`
-- Endpoint : `/booking/status/:status` ("pending", "accept", "decline")
+- Endpoint : `/api/v1/booking/status/:status` ("pending", "accept", "decline")
 - Header :
   - Accept : application/json
 - Body :
@@ -393,7 +738,7 @@ Response :
 Request :
 
 - Method : `GET`
-- Endpoint : `/booking/approval`
+- Endpoint : `/api/v1/booking/approval`
 - Header :
   - Accept : application/json
 - Body :
@@ -413,52 +758,46 @@ Response :
 ```json
 {
   "status": {
-    "code": 200,
+    "code": 201,
     "description": "Ok"
   },
   "data": {
-    "bookingId": "bdcaecf0-6ff5-4f9f-9225-49de1d584212",
+    "bookingId": "String",
     "employe": {
-      "id": "8f568c4a-95b4-46ec-ba29-de66b2e84f86",
-      "name": "ricky",
-      "divisi": "enigma",
-      "jabatan": "karyawan",
-      "email": "ricky@mail.com",
-      "role": "GA",
-      "createdAt": "2023-11-15T11:32:48.532463Z",
-      "updatedAt": "2023-11-15T11:32:48.466881Z"
+      "id": "String",
+      "name": "String",
+      "divisi": "String",
+      "jabatan": "String",
+      "email": "String",
+      "role": "String",
     },
     "bookingDetails": [
       {
-        "id": "0dd409b8-f8c2-402a-9133-7dcae0c7cada",
-        "bookingId": "",
+        "id": "String",
+        "bookingId": "String",
         "rooms": {
-          "id": "92681558-650e-44fa-95ce-7ee92e7220b8",
-          "roomType": "kolam_renang",
-          "maxcapacity": 12,
+          "id": "String",
+          "roomType": "String",
+          "maxcapacity": "Number",
           "facility": {
-            "id": "83cca32f-45da-41ac-a35d-31e53c6952bd",
-            "description": "anjay",
-            "wifi": "ada tapi indihumu",
-            "soundSystem": "salon adanya",
-            "projector": "ada",
-            "screenProjector": "",
-            "chairs": "ada",
-            "tables": "ada",
-            "soundProof": "ada",
-            "smokingArea": "ada",
-            "television": "ada",
-            "ac": "ac alam",
-            "bathroom": "JEDING KEBON",
-            "coffeMaker": "ada",
-            "createdAt": "2023-11-15T11:50:15.156612Z",
-            "updatedAt": "2023-11-15T11:50:15.314491Z"
+            "id": "String",
+            "description": "String",
+            "wifi": "String",
+            "soundSystem": "String",
+            "projector": "String",
+            "screenProjector": "String",
+            "chairs": "String",
+            "tables": "String",
+            "soundProof": "String",
+            "smokingArea": "String",
+            "television": "String",
+            "ac": "String",
+            "bathroom": "String",
+            "coffeMaker": "String",
           },
           "status": "available",
-          "createdAt": "2023-11-15T11:50:15.326955Z",
-          "updatedAt": "2023-11-15T11:50:15.326477Z"
         },
-        "description": "ini desciption",
+        "description": "String",
         "status": "decline",
         "bookingDate": "2023-11-21T08:45:00.954394Z",
         "bookingDateEnd": "2023-11-21T11:45:00.954394Z",
